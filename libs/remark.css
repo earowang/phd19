@@ -5,9 +5,11 @@
 @import url('https://fonts.googleapis.com/css?family=Caveat');
 @import url(https://fonts.googleapis.com/css?family=Source+Code+Pro:400,500,600);
 @import url('https://fonts.googleapis.com/css?family=Libre+Barcode+39+Text');
+@import url("https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.7.0/animate.min.css");
 
 body {
   font-family: 'Assistant', sans-serif;
+  color: #1a2a3a;
 }
 h1, h2, h3 {
   margin-bottom: 0;
@@ -190,7 +192,6 @@ code {
 .right-column {
   width: 75%;
   float: right;
-  padding-top: 1em;
 }
 
 .title-slide {
@@ -264,3 +265,9 @@ blockquote:before {
 /* talk-specific */
 @import url("https://use.fontawesome.com/releases/v5.2.0/css/all.css");
 .barcode { font-family: 'Libre Barcode 39 Text', cursive; }
+.pipeline img {
+  display: block;
+  position: absolute;
+  margin-left: 46.6%;
+  margin-top: 15.5%;
+}

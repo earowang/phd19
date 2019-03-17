@@ -109,55 +109,116 @@ background-size: 75%
 
 ---
 
-## Tidy tools are
+class: middle
 
-1.
-2.
-3.
+```r
+marathon %&gt;% 
+  model(
+    linear = TSLM(Minutes ~ trend()),
+    exponential = TSLM(log(Minutes) ~ trend()),
+    piecewise = TSLM(Minutes ~ trend(knots = c(1940, 1980)))
+  ) %&gt;% 
+  forecast(h = 10)
+```
 
----
-
-.pull-left[
-### 2018
-&lt;img src="img/model-forecast.png", height = "400px"&gt;
-]
-.pull-right[
-### 2019
-&lt;img src="img/model-fable.png", height = "400px"&gt;
-]
-
---
-
-## .center[Behind tidy tools is tidy temporal data.]
-
----
-
-class: center middle
-
-&lt;img src="img/tsibble.png", height = "320px"&gt;
-
-## The future of temporal data
-
----
-
-class: center middle
-
-&lt;img src="img/tsibble.png", height = "320px"&gt;
-
-## The future is just around the corner.
-
----
-
-## Tsibble is
-
-1. a data representation for tidy temporal data
-2. a domain specific language in R for wrangling temporal data
+1. Tidy tools are .orange[accessible].
+2. Tidy tools are .orange[expressive].
+3. Tidy tools are .orange[pipeable].
 
 ---
 
 class: inverse middle
 
 # What is fluent workflow?
+
+---
+
+.left-column[
+.center[
+## Welcome to
+&lt;img src="https://github.com/rstudio/hex-stickers/blob/master/PNG/tidyverse.png?raw=true", height = "200px"&gt;
+]
+]
+.right-column[
+&lt;br&gt;
+&lt;br&gt;
+&lt;img src="img/tidy-model.png", width = "100%"&gt;
+]
+
+--
+
+### .center[Behind fluent workflow is tidy data.]
+
+---
+
+.left-column[
+.center[
+## Welcome to &lt;br&gt; .red[time series analysis]
+]
+]
+.right-column[
+&lt;br&gt;
+&lt;br&gt;
+&lt;img src="img/ts-model.png", width = "100%"&gt;
+]
+
+--
+
+### .center[WAT!😱]
+
+---
+
+.left-column[
+## WAT!😱
+]
+.right-column[
+```r
+# Put them into a big matrix
+ltraffics &lt;- list(as.bf.cpu, as.bf.busy, as.bf.memory, as.bf.page,
+                  as.gq.cpu, as.gq.busy, as.gq.memory, as.gq.page,
+                  as.ir.cpu, as.ir.busy, as.ir.memory, as.ir.page,
+                  ...
+                  hs.gq.cpu, hs.gq.busy, hs.gq.memory, hs.gq.page,
+                  hs.ir.cpu, hs.ir.busy, hs.ir.memory, hs.ir.page,
+                  hs.ne.cpu, hs.ne.busy, hs.ne.memory, hs.ne.page,
+                  hs.sg.cpu, hs.sg.busy, hs.sg.memory, hs.sg.page)
+indcols &lt;- sapply(ltraffics, ncol)
+cs &lt;- cumsum(c(1, indcols))
+totalcols &lt;- sum(indcols)
+traffics &lt;- matrix(, nrow = 719, ncol = totalcols)
+for (i in 1L:length(ltraffics)) {
+  idx &lt;- cs[i]:(cs[i + 1] - 1L)
+  traffics[, idx] &lt;- as.matrix(ltraffics[[i]][1:719, ])
+}
+```
+]
+
+---
+
+background-image: url(img/tsibble-model.png)
+background-size: 70%
+background-position: 91% 38%
+
+.animated.slower.rollIn[
+.pipeline[&lt;img src="img/tsibble.png", height = "150px"&gt;]
+]
+
+---
+
+class: center middle
+
+&lt;img src="img/tsibble.png", height = "320px"&gt;
+
+## The future is around the corner.
+
+---
+
+Tsibble is aimed at
+
+1. a data representation for tidy temporal data
+2. a domain specific language in R for wrangling temporal data
+
+---
     </textarea>
 <style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
 <script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
