@@ -4,8 +4,9 @@
 @import url('https://fonts.googleapis.com/css?family=Rosario');
 @import url('https://fonts.googleapis.com/css?family=Caveat');
 @import url(https://fonts.googleapis.com/css?family=Source+Code+Pro:400,500,600);
-@import url('https://fonts.googleapis.com/css?family=Libre+Barcode+39+Text');
+@import url("https://use.fontawesome.com/releases/v5.2.0/css/all.css");
 @import url("https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.7.0/animate.min.css");
+@import url('https://fonts.googleapis.com/css?family=Libre+Barcode+39+Text');
 
 body {
   font-family: 'Assistant', sans-serif;
@@ -85,6 +86,7 @@ ul li li:before {
 .blue { color: #22b6ed; }
 .green { color: #1fb27f; }
 .yellow { color: #faca07; }
+.brown {color: #a84d18; }
 
 .rotate-45 {transform: rotate(45deg); }
 .large { font-size: 120%; }
@@ -92,11 +94,6 @@ ul li li:before {
 
 .center {
   text-align: center;
-}
-.top {
-  position: absolute;
-  top: 5%;
-  right: 5%;
 }
 
 a, a > code {
@@ -108,18 +105,18 @@ code {
   border-radius: 5px;
 }
 .remark-code, .remark-inline-code { font-family: 'Source Code Pro'; font-size: 80%; }
-.remark-code, .remark-code-line { font-family: 'Source Code Pro'; font-size: 85%; }
+.remark-code, .remark-code-line { font-family: 'Source Code Pro'; font-size: 82%; }
 .remark-code-line-highlighted {
-  background-color: #fee8c8;
+  background-color: #d0e4a9;
 }
 
 .pull-left {
   float: left;
-  width: 47%;
+  width: 49%;
 }
 .pull-right {
   float: right;
-  width: 47%;
+  width: 49%;
 }
 .pull-right ~ p {
   clear: both;
@@ -263,11 +260,38 @@ blockquote:before {
 }
 
 /* talk-specific */
-@import url("https://use.fontawesome.com/releases/v5.2.0/css/all.css");
 .barcode { font-family: 'Libre Barcode 39 Text', cursive; }
 .pipeline img {
   display: block;
   position: absolute;
-  margin-left: 46.6%;
-  margin-top: 15.5%;
+  margin-left: 29%;
+  margin-top: 20.5%;
+}
+.top {
+  position: absolute;
+  top: 5%;
+  right: 5%;
+}
+.bottom {
+  position: absolute;
+  top: 75%;
+  right: 5%;
+}
+
+.portrait {
+  /* margin: 10px; */
+  display: inline-block;
+  padding: 0px 5px 0px 5px;
+  font-size: 22px;
+  text-align: center;
+}
+
+.portrait img {
+  display: block;
+  padding-bottom: 10px;
+  width: 150px;
+  height: 150px;
+  margin-left: auto;
+  margin-right: auto;
+  border-radius: 50%;
 }

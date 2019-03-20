@@ -28,7 +28,15 @@ class: inverse middle
 
 class: middle
 
-&gt; Data analysis is a process of .orange[inspecting], .orange[cleansing], .orange[transforming], and .orange[modeling] data with the goal of discovering useful information, informing conclusions, and supporting decision-making. ([Wikipedia](https://en.wikipedia.org/wiki/Data_analysis))
+&gt; Data analysis is a process of .orange[inspecting], .orange[cleansing], .orange[transforming], and .orange[modeling] data with the goal of discovering useful information, informing conclusions, and supporting decision-making. &lt;br&gt;
+--- [Wikipedia](https://en.wikipedia.org/wiki/Data_analysis)
+
+---
+
+class: middle
+
+&gt; .orange[Temporal data analysis] is a process of inspecting, cleansing, transforming, and modeling .orange[time-indexed] data with the goal of discovering useful information, informing conclusions, and supporting decision-making .orange[related to time]. &lt;br&gt;
+--- [EaroWiki](https://earo.me)
 
 ---
 
@@ -111,19 +119,22 @@ background-size: 75%
 
 class: middle
 
+1. Tidy tools are .orange[accessible].
+2. Tidy tools are .orange[expressive].
+3. Tidy tools are .orange[pipeable].
+
 ```r
 marathon %&gt;% 
   model(
+    # Linear trend
     linear = TSLM(Minutes ~ trend()),
+    # Exponential trend
     exponential = TSLM(log(Minutes) ~ trend()),
+    # Piecewise linear trend
     piecewise = TSLM(Minutes ~ trend(knots = c(1940, 1980)))
   ) %&gt;% 
   forecast(h = 10)
 ```
-
-1. Tidy tools are .orange[accessible].
-2. Tidy tools are .orange[expressive].
-3. Tidy tools are .orange[pipeable].
 
 ---
 
@@ -162,14 +173,12 @@ class: inverse middle
 &lt;img src="img/ts-model.png", width = "100%"&gt;
 ]
 
---
-
 ### .center[WAT!😱]
 
 ---
 
 .left-column[
-## WAT!😱
+## .center[WAT!😱]
 ]
 .right-column[
 ```r
@@ -199,29 +208,367 @@ background-image: url(img/tsibble-model.png)
 background-size: 70%
 background-position: 91% 38%
 
+.left-column[
+## .center[Welcome &lt;br&gt; to &lt;br&gt; the tidyver.red[ts]]
+]
+.right-column[
 .animated.slower.rollIn[
 .pipeline[&lt;img src="img/tsibble.png", height = "150px"&gt;]
+]
+]
+
+### .bottom[.center[Tsibble defines tidy data in temporal context.]]
+
+---
+
+class: inverse middle
+
+# Data analysis &lt;br&gt; doesn't make sense &lt;br&gt; without data.
+
+---
+
+class: center
+
+## Parallel data stories
+
+.pull-left[
+&lt;img src="img/website.png", height = "320px"&gt;
+
+### Web traffic at [earo.me](http://earo.me)
+]
+.pull-right[
+&lt;img src="img/us-airlines.png", height = "320px"&gt;
+
+### Airline traffic in the US
+]
+
+---
+
+.pull-left[
+### Web
+
+
+```
+#&gt; # A tibble: 1,096 x 2
+#&gt;   Date       Users
+#&gt;   &lt;date&gt;     &lt;dbl&gt;
+#&gt; 1 2016-03-17     0
+#&gt; 2 2016-03-18     0
+#&gt; 3 2016-03-19     0
+#&gt; 4 2016-03-20     0
+#&gt; 5 2016-03-21     0
+#&gt; 6 2016-03-22     0
+#&gt; # … with 1,090 more rows
+```
+]
+.pull-right[
+### Airline
+]
+
+---
+
+class: inverse middle
+
+# .blue[1.] Tsibble is &lt;br&gt; data reprentation &lt;br&gt; for tidy temporal data.
+
+&lt;hr&gt;
+
+&lt;img src="img/tsibble-semantics.png", height = "120px"&gt;
+
+---
+
+## Contextual semantics
+
+### 1. Index
+
+### 2. Key
+
+### 3. Interval
+
+---
+
+.pull-left[
+
+```r
+web_ts &lt;- web %&gt;% 
+  as_tsibble(
+    key = id(), index = Date
+  )
+```
+
+
+```
+*#&gt; # A tsibble: 1,096 x 2 [1D]
+#&gt;   Date       Users
+#&gt;   &lt;date&gt;     &lt;dbl&gt;
+#&gt; 1 2016-03-17     0
+#&gt; 2 2016-03-18     0
+#&gt; 3 2016-03-19     0
+#&gt; 4 2016-03-20     0
+#&gt; 5 2016-03-21     0
+#&gt; 6 2016-03-22     0
+#&gt; # … with 1,090 more rows
+```
+
+]
+
+--
+
+.pull-right[
+### Airline
+]
+
+---
+
+## &lt;i class="fas fa-search"&gt;&lt;/i&gt; duplicates and &lt;i class="fas fa-wrench"&gt;&lt;/i&gt; them
+
+Airline duplicates
+
+---
+
+## In harmony with grammar of graphics
+
+
+```r
+web_ts %&gt;% 
+* ggplot(aes(x = Date, y = Users))
+```
+
+&lt;img src="figure/web-ggplot-1.svg" style="display: block; margin: auto;" /&gt;
+
+---
+
+## In harmony with grammar of graphics
+
+
+```r
+web_ts %&gt;% 
+  ggplot(aes(x = Date, y = Users)) +
+* geom_area(colour = "#3182bd", fill = "#9ecae1")
+```
+
+&lt;img src="figure/web-geom-1.svg" style="display: block; margin: auto;" /&gt;
+
+---
+
+class: inverse middle
+
+# .blue[2.] Tsibble is &lt;br&gt; a domain specific language in &lt;i class="fab fa-r-project"&gt;&lt;/i&gt; &lt;br&gt; for wrangling temporal data.
+
+&lt;hr&gt;
+
+### Good fluent APIs take a while to build.
+
+---
+
+.pull-left[
+**.brown[1.] Vector functions**
+* `yearmonth()`/`yearquarter()`
+* `time_in()`
+* `difference()`
+
+**.brown[3.] Window family**
+* `slide()`/`future_slide()`
+* `tile()`/`future_tile()`
+* `stretch()`/`future_stretch()`
+]
+.pull-right[
+**.brown[2.] Table verbs**
+* `scan_gaps()`/`fill_gaps()`
+* `index_by()`/`group_by_key()`
+* `filter_index()`
+
+**.brown[4.] Extend tsibble**
+* `index_valid()`
+* `pull_interval()`
+* `new_tsibble()`
+]
+
+---
+
+class: center
+
+.left-column[
+## Scroll down &lt;br&gt; for &lt;br&gt; a full list
+]
+.right-column[
+&lt;br&gt;
+
+&lt;iframe src="https://tsibble.tidyverts.org/reference/index.html" frameborder="0" height="400" width="750"&gt;
+&lt;/iframe&gt;
+
+### [tsibble.tidyverts.org](https://tsibble.tidyverts.org)
 ]
 
 ---
 
 class: center middle
 
-&lt;img src="img/tsibble.png", height = "320px"&gt;
+&lt;img src="img/tsibble.png" height=180px&gt;
+
+## standing on the shoulders of giants
+
+.animated.fadeInRight.slow[
+.orange[
+
+```
+⬢ __  _    __   .    ⬡           ⬢  . 
+ / /_(_)__/ /_ ___  _____ _______ ___ 
+/ __/ / _  / // / |/ / -_) __(_-&lt;/ -_)
+\__/_/\_,_/\_, /|___/\__/_/ /___/\__/ 
+     ⬢  . /___/      ⬡      .       ⬢ 
+```
+]
+]
+
+---
+
+.pull-left[
+
+```r
+web_year &lt;- web_ts %&gt;% 
+  index_by(Year = year(Date)) %&gt;% 
+  summarise(Users = sum(Users))
+```
+
+```
+#&gt; # A tsibble: 4 x 2 [1Y]
+#&gt;    Year Users
+#&gt;   &lt;dbl&gt; &lt;dbl&gt;
+#&gt; 1  2016   163
+#&gt; 2  2017  1149
+#&gt; 3  2018  2562
+#&gt; 4  2019   956
+```
+]
+.pull-right[
+]
+
+---
+
+.pull-left[
+
+```r
+web_year %&gt;% 
+  ggplot(aes(x = Year, y = Users)) +
+  geom_col()
+```
+
+&lt;img src="figure/web-year-bar-1.svg" style="display: block; margin: auto;" /&gt;
+]
+.pull-right[
+]
+
+---
+
+class: inverse middle
+
+# .blue[3.] Tsibble rolls with &lt;br&gt; functional programming.
+
+---
+
+class: center middle
+
+&lt;img src="img/tsibble.png", height = "220px"&gt;
 
 ## The future is around the corner.
 
 ---
 
-Tsibble is aimed at
+class: inverse middle
 
-1. a data representation for tidy temporal data
-2. a domain specific language in R for wrangling temporal data
+# Impact 🌟
 
 ---
+
+.pull-left[
+### sugrrants &lt;a class="github-button" href="https://github.com/earowang/sugrrants" data-size="large" data-show-count="true" aria-label="Star earowang/sugrrants on GitHub"&gt;Star&lt;/a&gt;
+🥇 2018 Best student paper award from ASA Section on Statistical Graphics
+
+&lt;hr&gt;
+
+### tsibble &lt;a class="github-button" href="https://github.com/tidyverts/tsibble" data-size="large" data-show-count="true" aria-label="Star tidyverts/tsibble on GitHub"&gt;Star&lt;/a&gt;
+🏆 2019 John Chambers Statistical Software Award from ASA Section on Statistical Computing
+]
+.pull-right[
+]
+
+---
+
+class: center
+
+&lt;iframe src="https://thesis.earo.me/preface.html" frameborder="0" height="400" width="850"&gt;
+&lt;/iframe&gt;
+
+.pull-left[
+### &lt;i class="fas fa-link"&gt;&lt;/i&gt; [thesis.earo.me](https://thesis.earo.me)
+]
+.pull-right[
+### &lt;i class="fab fa-github"&gt;&lt;/i&gt; [earowang/thesis](https://github.com/earowang/thesis)
+]
+
+##  Open access and (persistent) reproducibility
+
+---
+
+class: inverse
+
+.left-column[
+.animated.pulse.infinite[
+# .red[.center[❤️]]
+]
+]
+.right-column[
+.portrait[
+![](img/di.jpg)
+Di
+]
+.portrait[
+![](https://robjhyndman.com/img/rjh.png)
+Rob
+]
+&lt;br&gt;
+.portrait[
+![](https://pbs.twimg.com/profile_images/2162872292/Photo_on_2012-02-20_at_08.18_400x400.jpg)
+Heike
+]
+.portrait[
+![](https://mitchelloharawild.com/img/circle.jpg)
+Mitch
+]
+.portrait[
+![](https://pbs.twimg.com/profile_images/1035681370251526145/Ks3Mbojm_400x400.jpg)
+Stuart
+]
+.portrait[
+![](img/david.jpeg)
+David
+]
+.portrait[
+![](https://pbs.twimg.com/profile_images/1588338728/peng7_400x400.png)
+Roger
+]
+.portrait[
+![](https://avatars0.githubusercontent.com/u/6488485?s=460&amp;v=4)
+Nick
+]
+.portrait[
+![](https://pbs.twimg.com/profile_images/967154482856382464/UHPzicve_400x400.jpg)
+Carson
+]
+.portrait[
+![](img/numbat-painted.png)
+NUMBATs
+]
+.portrait[
+![](img/Rlogo.png)
+&lt;i class="fab fa-r-project"&gt;&lt;/i&gt; community
+]
+]
     </textarea>
 <style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
 <script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script src="https://buttons.github.io/buttons.js"></script>
 <script>var slideshow = remark.create({
 "ratio": "16:9",
 "highlightStyle": "github",

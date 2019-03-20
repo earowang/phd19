@@ -1,6 +1,6 @@
 ## ---- theme-remark
 theme_remark <- function() {
-  theme_grey() +
+  theme_bw() +
   theme(
     axis.text = element_text(size = 14), 
     strip.text = element_text(size = 16), 
