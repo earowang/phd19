@@ -26,6 +26,20 @@ web_ts %>%
   ggplot(aes(x = Date, y = Users)) +
   geom_area(colour = "#3182bd", fill = "#9ecae1") #<<
 
+## ---- web-tsibble-select
+web_ts %>% select(Users)
+
+## ---- web-dplyr-select
+web %>% select(Users)
+
+## ---- web-tsibble-summarise
+web_ts %>% 
+  summarise(Users = sum(Users))
+
+## ---- web-dplyr-summarise
+web %>% 
+  summarise(Users = sum(Users))
+
 ## ---- web-year
 web_year <- web_ts %>% 
   index_by(Year = year(Date)) %>% 

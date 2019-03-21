@@ -126,11 +126,8 @@ class: middle
 ```r
 marathon %&gt;% 
   model(
-    # Linear trend
     linear = TSLM(Minutes ~ trend()),
-    # Exponential trend
     exponential = TSLM(log(Minutes) ~ trend()),
-    # Piecewise linear trend
     piecewise = TSLM(Minutes ~ trend(knots = c(1940, 1980)))
   ) %&gt;% 
   forecast(h = 10)
@@ -227,7 +224,7 @@ class: inverse middle
 
 ---
 
-class: center
+class: center middle
 
 ## Parallel data stories
 
@@ -245,7 +242,7 @@ class: center
 ---
 
 .pull-left[
-### Web
+### Web traffic
 
 
 ```
@@ -263,13 +260,42 @@ class: center
 ]
 .pull-right[
 ### Airline
+
+
+```
+#&gt; # A tibble: 5,548,445 x 22
+#&gt;   flight_num sched_dep_datetime 
+#&gt;   &lt;chr&gt;      &lt;dttm&gt;             
+#&gt; 1 AA494      2017-01-17 16:19:00
+#&gt; 2 AA494      2017-01-18 16:19:00
+#&gt; 3 AA494      2017-01-19 16:19:00
+#&gt; 4 AA494      2017-01-20 16:19:00
+#&gt; 5 AA494      2017-01-21 16:19:00
+#&gt; 6 AA494      2017-01-22 16:19:00
+#&gt; # … with 5.548e+06 more rows, and 20
+#&gt; #   more variables:
+#&gt; #   sched_arr_datetime &lt;dttm&gt;,
+#&gt; #   dep_delay &lt;dbl&gt;, arr_delay &lt;dbl&gt;,
+#&gt; #   carrier &lt;chr&gt;, tailnum &lt;chr&gt;,
+#&gt; #   origin &lt;chr&gt;, dest &lt;chr&gt;,
+#&gt; #   air_time &lt;dbl&gt;, distance &lt;dbl&gt;,
+#&gt; #   origin_city_name &lt;chr&gt;,
+#&gt; #   origin_state &lt;chr&gt;,
+#&gt; #   dest_city_name &lt;chr&gt;,
+#&gt; #   dest_state &lt;chr&gt;, taxi_out &lt;dbl&gt;,
+#&gt; #   taxi_in &lt;dbl&gt;, carrier_delay &lt;dbl&gt;,
+#&gt; #   weather_delay &lt;dbl&gt;,
+#&gt; #   nas_delay &lt;dbl&gt;,
+#&gt; #   security_delay &lt;dbl&gt;,
+#&gt; #   late_aircraft_delay &lt;dbl&gt;
+```
 ]
 
 ---
 
 class: inverse middle
 
-# .blue[1.] Tsibble is &lt;br&gt; data reprentation &lt;br&gt; for tidy temporal data.
+# .blue[1.] Tsibble is &lt;br&gt; data representation &lt;br&gt; for tidy temporal data.
 
 &lt;hr&gt;
 
@@ -277,15 +303,34 @@ class: inverse middle
 
 ---
 
+.top[&lt;img src="img/tsibble-semantics.png", height = "80px"&gt;]
+
 ## Contextual semantics
 
-### 1. Index
+.pull-left[
+### .brown[1.] Index
 
-### 2. Key
+Time indices provide a contextual basis for temporal data.
 
-### 3. Interval
+* acknowledge the diversity of time representations
+* respect time zones
+* allow regular/irregular interval
+]
+.pull-right[
+### .brown[2.] Key
+
+Key identifies observational units recorded over time.
+
+* comprise empty, one or more variables
+* known a priori by analysts
+* determine unique time indices
+]
 
 ---
+
+class: middle
+
+## Creating a tsibble
 
 .pull-left[
 
@@ -315,16 +360,93 @@ web_ts &lt;- web %&gt;%
 --
 
 .pull-right[
-### Airline
+
+```r
+flights_ts &lt;- flights %&gt;% 
+  as_tsibble(
+    key = id(flight_num), 
+    index = sched_dep_datetime,
+    regular = FALSE
+  )
+```
+
+```
+#&gt; Error: A valid tsibble must have
+distinct rows identified by key and
+index.
+#&gt; Please use `duplicates()` to check
+the duplicated rows.```
+### .red[Oops!]
 ]
 
 ---
 
 ## &lt;i class="fas fa-search"&gt;&lt;/i&gt; duplicates and &lt;i class="fas fa-wrench"&gt;&lt;/i&gt; them
 
-Airline duplicates
+
+```r
+flights %&gt;% 
+  duplicates(key = id(flight_num), index = sched_dep_datetime)
+```
+
+
+```
+#&gt; # A tibble: 2 x 22
+#&gt;   flight_num sched_dep_datetime  sched_arr_datetime  dep_delay arr_delay
+#&gt;   &lt;chr&gt;      &lt;dttm&gt;              &lt;dttm&gt;                  &lt;dbl&gt;     &lt;dbl&gt;
+*#&gt; 1 NK630      2017-08-03 17:45:00 2017-08-03 21:00:00       140       194
+#&gt; 2 NK630      2017-08-03 17:45:00 2017-08-03 21:00:00       140       194
+#&gt;   carrier tailnum origin dest  air_time distance origin_city_name
+#&gt;   &lt;chr&gt;   &lt;chr&gt;   &lt;chr&gt;  &lt;chr&gt;    &lt;dbl&gt;    &lt;dbl&gt; &lt;chr&gt;           
+*#&gt; 1 NK      N601NK  LAX    DEN        107      862 Los Angeles     
+#&gt; 2 NK      N639NK  ORD    LGA        107      733 Chicago         
+#&gt; # … with 10 more variables: origin_state &lt;chr&gt;, dest_city_name &lt;chr&gt;,
+#&gt; #   dest_state &lt;chr&gt;, taxi_out &lt;dbl&gt;, taxi_in &lt;dbl&gt;, carrier_delay &lt;dbl&gt;,
+#&gt; #   weather_delay &lt;dbl&gt;, nas_delay &lt;dbl&gt;, security_delay &lt;dbl&gt;,
+#&gt; #   late_aircraft_delay &lt;dbl&gt;
+```
 
 ---
+
+
+
+
+```r
+flights_ts &lt;- flights %&gt;% 
+  filter(!dup_lgl) %&gt;% 
+  as_tsibble(
+    key = id(flight_num), index = sched_dep_datetime, regular = FALSE
+  )
+```
+
+
+```
+*#&gt; # A tsibble: 5,548,444 x 22 [!] &lt;UTC&gt;
+*#&gt; # Key:       flight_num [22,562]
+#&gt;   flight_num sched_dep_datetime  sched_arr_datetime  dep_delay
+#&gt;   &lt;chr&gt;      &lt;dttm&gt;              &lt;dttm&gt;                  &lt;dbl&gt;
+#&gt; 1 AA1        2017-01-01 08:00:00 2017-01-01 11:42:00        31
+#&gt; 2 AA1        2017-01-02 08:00:00 2017-01-02 11:42:00        -3
+#&gt; 3 AA1        2017-01-03 08:00:00 2017-01-03 11:42:00        -6
+#&gt; 4 AA1        2017-01-04 08:00:00 2017-01-04 11:42:00        -3
+#&gt; 5 AA1        2017-01-05 08:00:00 2017-01-05 11:42:00        -7
+#&gt; 6 AA1        2017-01-06 08:00:00 2017-01-06 11:42:00        -3
+#&gt; # … with 5.548e+06 more rows, and 18 more variables: arr_delay &lt;dbl&gt;,
+#&gt; #   carrier &lt;chr&gt;, tailnum &lt;chr&gt;, origin &lt;chr&gt;, dest &lt;chr&gt;,
+#&gt; #   air_time &lt;dbl&gt;, distance &lt;dbl&gt;, origin_city_name &lt;chr&gt;,
+#&gt; #   origin_state &lt;chr&gt;, dest_city_name &lt;chr&gt;, dest_state &lt;chr&gt;,
+#&gt; #   taxi_out &lt;dbl&gt;, taxi_in &lt;dbl&gt;, carrier_delay &lt;dbl&gt;,
+#&gt; #   weather_delay &lt;dbl&gt;, nas_delay &lt;dbl&gt;, security_delay &lt;dbl&gt;,
+#&gt; #   late_aircraft_delay &lt;dbl&gt;
+```
+
+---
+
+&lt;img src="img/tsibble-pipeline.png" height=580px&gt;
+
+---
+
+.top[&lt;img src="img/website.png", height = "80px"&gt;]
 
 ## In harmony with grammar of graphics
 
@@ -337,6 +459,8 @@ web_ts %&gt;%
 &lt;img src="figure/web-ggplot-1.svg" style="display: block; margin: auto;" /&gt;
 
 ---
+
+.top[&lt;img src="img/website.png", height = "80px"&gt;]
 
 ## In harmony with grammar of graphics
 
@@ -389,7 +513,7 @@ class: inverse middle
 class: center
 
 .left-column[
-## Scroll down &lt;br&gt; for &lt;br&gt; a full list
+## Scroll down &lt;br&gt; for &lt;br&gt; the full vocabulary
 ]
 .right-column[
 &lt;br&gt;
@@ -424,6 +548,96 @@ class: center middle
 ---
 
 .pull-left[
+&lt;img src="img/tsibble.png" height=80px&gt;
+
+```r
+web_ts %&gt;% select(Users)
+```
+
+```
+#&gt; Selecting index: "Date"
+```
+
+```
+#&gt; # A tsibble: 1,096 x 2 [1D]
+#&gt;   Users Date      
+#&gt;   &lt;dbl&gt; &lt;date&gt;    
+#&gt; 1     0 2016-03-17
+#&gt; 2     0 2016-03-18
+#&gt; 3     0 2016-03-19
+#&gt; 4     0 2016-03-20
+#&gt; 5     0 2016-03-21
+#&gt; 6     0 2016-03-22
+#&gt; # … with 1,090 more rows
+```
+]
+.pull-right[
+&lt;img src="https://github.com/rstudio/hex-stickers/blob/master/PNG/tidyverse.png?raw=true", height = "80px"&gt;
+
+```r
+web %&gt;% select(Users)
+```
+
+```
+#&gt; # A tibble: 1,096 x 1
+#&gt;   Users
+#&gt;   &lt;dbl&gt;
+#&gt; 1     0
+#&gt; 2     0
+#&gt; 3     0
+#&gt; 4     0
+#&gt; 5     0
+#&gt; 6     0
+#&gt; # … with 1,090 more rows
+```
+]
+
+---
+
+.pull-left[
+&lt;img src="img/tsibble.png" height=80px&gt;
+
+```r
+web_ts %&gt;% 
+  summarise(Users = sum(Users))
+```
+
+```
+#&gt; # A tsibble: 1,096 x 2 [1D]
+#&gt;   Date       Users
+#&gt;   &lt;date&gt;     &lt;dbl&gt;
+#&gt; 1 2016-03-17     0
+#&gt; 2 2016-03-18     0
+#&gt; 3 2016-03-19     0
+#&gt; 4 2016-03-20     0
+#&gt; 5 2016-03-21     0
+#&gt; 6 2016-03-22     0
+#&gt; # … with 1,090 more rows
+```
+]
+.pull-right[
+&lt;img src="https://github.com/rstudio/hex-stickers/blob/master/PNG/tidyverse.png?raw=true", height = "80px"&gt;
+
+```r
+web %&gt;% 
+  summarise(Users = sum(Users))
+```
+
+```
+#&gt; # A tibble: 1 x 1
+#&gt;   Users
+#&gt;   &lt;dbl&gt;
+#&gt; 1  4830
+```
+]
+
+---
+
+.top[&lt;img src="img/website.png", height = "80px"&gt;]
+
+## Compose a prose
+
+.pull-left[
 
 ```r
 web_year &lt;- web_ts %&gt;% 
@@ -442,21 +656,39 @@ web_year &lt;- web_ts %&gt;%
 ```
 ]
 .pull-right[
+&lt;img src="figure/web-year-bar-1.svg" style="display: block; margin: auto;" /&gt;
 ]
 
 ---
 
-.pull-left[
+.top[&lt;img src="img/us-airlines.png", height = "80px"&gt;]
+
 
 ```r
-web_year %&gt;% 
-  ggplot(aes(x = Year, y = Users)) +
-  geom_col()
+sel_delay &lt;- flights_ts %&gt;% 
+  filter(origin %in% c("JFK", "KOA", "LAX")) %&gt;% 
+  group_by(origin) %&gt;% 
+  index_by(sched_dep_date = as_date(sched_dep_datetime)) %&gt;% 
+  summarise(pct_delay = sum(dep_delay &gt; 15) / n())
 ```
+.pull-left[
 
-&lt;img src="figure/web-year-bar-1.svg" style="display: block; margin: auto;" /&gt;
+```
+#&gt; # A tsibble: 1,095 x 3 [1D]
+#&gt; # Key:       origin [3]
+#&gt;   origin sched_dep_date pct_delay
+#&gt;   &lt;chr&gt;  &lt;date&gt;             &lt;dbl&gt;
+#&gt; 1 JFK    2017-01-01         0.15 
+#&gt; 2 JFK    2017-01-02         0.281
+#&gt; 3 JFK    2017-01-03         0.309
+#&gt; 4 JFK    2017-01-04         0.15 
+#&gt; 5 JFK    2017-01-05         0.167
+#&gt; 6 JFK    2017-01-06         0.279
+#&gt; # … with 1,089 more rows
+```
 ]
 .pull-right[
+&lt;img src="figure/sel-flights-plot-1.svg" style="display: block; margin: auto;" /&gt;
 ]
 
 ---
@@ -464,6 +696,10 @@ web_year %&gt;%
 class: inverse middle
 
 # .blue[3.] Tsibble rolls with &lt;br&gt; functional programming.
+
+&lt;hr&gt;
+
+### FP focuses on expressions instead of for-loop statements.
 
 ---
 
@@ -477,9 +713,11 @@ class: center middle
 
 class: inverse middle
 
-# Impact 🌟
+# 🌟 Impact
 
 ---
+
+class: middle
 
 .pull-left[
 ### sugrrants &lt;a class="github-button" href="https://github.com/earowang/sugrrants" data-size="large" data-show-count="true" aria-label="Star earowang/sugrrants on GitHub"&gt;Star&lt;/a&gt;
@@ -491,23 +729,53 @@ class: inverse middle
 🏆 2019 John Chambers Statistical Software Award from ASA Section on Statistical Computing
 ]
 .pull-right[
+Total downloads, as of 2019-03-20
+&lt;img src="figure/software-impact-1.svg" style="display: block; margin: auto;" /&gt;
 ]
 
 ---
 
-class: center
+class: inverse middle
+
+# 📖 Research compendium
+
+&lt;hr&gt;
+
+### A form of publication contains all data and software for better reproducibility, besides the text and figures.
+**Marwick et al. (2018) [peerj.com/preprints/3192](https://peerj.com/preprints/3192/)**
+
+---
+
+class: middle
+
+
+```
+#&gt;                                                levelName
+#&gt; 1 .                                                     
+#&gt; 2  ¦--DESCRIPION # Lists of packages used for thesis    
+#&gt; 3  ¦--scripts/   # R code for analysis                  
+#&gt; 4  ¦--Rmd/       # R Markdown for thesis document       
+#&gt; 5  ¦--data/      # Cleaned data used for thesis document
+#&gt; 6  ¦--data-raw/  # Raw data and scripts to clean data   
+#&gt; 7  ¦--Dockerfile                                        
+#&gt; 8  °--...
+```
+
+
+### .center[&lt;i class="fab fa-github"&gt;&lt;/i&gt; [earowang/thesis](https://github.com/earowang/thesis)]
+
+## .center[Persistent reproducibility]
+
+---
+
+class: center middle
 
 &lt;iframe src="https://thesis.earo.me/preface.html" frameborder="0" height="400" width="850"&gt;
 &lt;/iframe&gt;
 
-.pull-left[
 ### &lt;i class="fas fa-link"&gt;&lt;/i&gt; [thesis.earo.me](https://thesis.earo.me)
-]
-.pull-right[
-### &lt;i class="fab fa-github"&gt;&lt;/i&gt; [earowang/thesis](https://github.com/earowang/thesis)
-]
 
-##  Open access and (persistent) reproducibility
+## Open access
 
 ---
 
@@ -549,14 +817,6 @@ David
 Roger
 ]
 .portrait[
-![](https://avatars0.githubusercontent.com/u/6488485?s=460&amp;v=4)
-Nick
-]
-.portrait[
-![](https://pbs.twimg.com/profile_images/967154482856382464/UHPzicve_400x400.jpg)
-Carson
-]
-.portrait[
 ![](img/numbat-painted.png)
 NUMBATs
 ]
@@ -565,6 +825,12 @@ NUMBATs
 &lt;i class="fab fa-r-project"&gt;&lt;/i&gt; community
 ]
 ]
+
+---
+
+class: inverse middle center
+
+# .animated.zoomOut.slower.delay-2s[.large[FIN]]
     </textarea>
 <style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
 <script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
