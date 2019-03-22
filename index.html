@@ -86,6 +86,27 @@ background-size: 75%
 
 ---
 
+class: middle
+
+background-image: url(img/model-forecast.png)
+background-size: 75%
+
+.pull-left[
+]
+.pull-right[
+.card[
+🤔 Should all forecasting students be programmers?
+]
+
+.rotate-45[
+.center[
+## NO!
+]
+]
+]
+
+---
+
 class: inverse middle
 
 # What are ~~messy~~ tidy tools?
@@ -126,9 +147,9 @@ class: middle
 ```r
 marathon %&gt;% 
   model(
-    linear = TSLM(Minutes ~ trend()),
-    exponential = TSLM(log(Minutes) ~ trend()),
-    piecewise = TSLM(Minutes ~ trend(knots = c(1940, 1980)))
+*   linear = TSLM(Minutes ~ trend()),
+*   exponential = TSLM(log(Minutes) ~ trend()),
+*   piecewise = TSLM(Minutes ~ trend(knots = c(1940, 1980)))
   ) %&gt;% 
   forecast(h = 10)
 ```
@@ -155,7 +176,7 @@ class: inverse middle
 
 --
 
-### .center[Behind fluent workflow is tidy data.]
+### .center[Behind fluent workflow is [tidy data](https://tidyr.tidyverse.org/articles/tidy-data.html).]
 
 ---
 
@@ -209,7 +230,7 @@ background-position: 91% 38%
 ## .center[Welcome &lt;br&gt; to &lt;br&gt; the tidyver.red[ts]]
 ]
 .right-column[
-.animated.slower.rollIn[
+.animated.slower.rollIn.delay-3s[
 .pipeline[&lt;img src="img/tsibble.png", height = "150px"&gt;]
 ]
 ]
@@ -314,7 +335,7 @@ Time indices provide a contextual basis for temporal data.
 
 * acknowledge the diversity of time representations
 * respect time zones
-* allow regular/irregular interval
+* allow regular/irregular intervals
 ]
 .pull-right[
 ### .brown[2.] Key
@@ -330,7 +351,7 @@ Key identifies observational units recorded over time.
 
 class: middle
 
-## Creating a tsibble
+## Declare a tsibble
 
 .pull-left[
 
@@ -481,7 +502,7 @@ class: inverse middle
 
 &lt;hr&gt;
 
-### Good fluent APIs take a while to build.
+### [Good fluent APIs take a while to build.](https://martinfowler.com/bliki/FluentInterface.html)
 
 ---
 
@@ -548,6 +569,26 @@ class: center middle
 ---
 
 .pull-left[
+&lt;img src="https://github.com/rstudio/hex-stickers/blob/master/PNG/tidyverse.png?raw=true", height = "80px"&gt;
+
+```r
+web %&gt;% select(Users)
+```
+
+```
+#&gt; # A tibble: 1,096 x 1
+#&gt;   Users
+#&gt;   &lt;dbl&gt;
+#&gt; 1     0
+#&gt; 2     0
+#&gt; 3     0
+#&gt; 4     0
+#&gt; 5     0
+#&gt; 6     0
+#&gt; # … with 1,090 more rows
+```
+]
+.pull-right[
 &lt;img src="img/tsibble.png" height=80px&gt;
 
 ```r
@@ -571,30 +612,25 @@ web_ts %&gt;% select(Users)
 #&gt; # … with 1,090 more rows
 ```
 ]
-.pull-right[
-&lt;img src="https://github.com/rstudio/hex-stickers/blob/master/PNG/tidyverse.png?raw=true", height = "80px"&gt;
-
-```r
-web %&gt;% select(Users)
-```
-
-```
-#&gt; # A tibble: 1,096 x 1
-#&gt;   Users
-#&gt;   &lt;dbl&gt;
-#&gt; 1     0
-#&gt; 2     0
-#&gt; 3     0
-#&gt; 4     0
-#&gt; 5     0
-#&gt; 6     0
-#&gt; # … with 1,090 more rows
-```
-]
 
 ---
 
 .pull-left[
+&lt;img src="https://github.com/rstudio/hex-stickers/blob/master/PNG/tidyverse.png?raw=true", height = "80px"&gt;
+
+```r
+web %&gt;% 
+  summarise(Users = sum(Users))
+```
+
+```
+#&gt; # A tibble: 1 x 1
+#&gt;   Users
+#&gt;   &lt;dbl&gt;
+#&gt; 1  4830
+```
+]
+.pull-right[
 &lt;img src="img/tsibble.png" height=80px&gt;
 
 ```r
@@ -615,27 +651,12 @@ web_ts %&gt;%
 #&gt; # … with 1,090 more rows
 ```
 ]
-.pull-right[
-&lt;img src="https://github.com/rstudio/hex-stickers/blob/master/PNG/tidyverse.png?raw=true", height = "80px"&gt;
-
-```r
-web %&gt;% 
-  summarise(Users = sum(Users))
-```
-
-```
-#&gt; # A tibble: 1 x 1
-#&gt;   Users
-#&gt;   &lt;dbl&gt;
-#&gt; 1  4830
-```
-]
 
 ---
 
 .top[&lt;img src="img/website.png", height = "80px"&gt;]
 
-## Compose a prose
+## Compose prose
 
 .pull-left[
 
@@ -699,7 +720,116 @@ class: inverse middle
 
 &lt;hr&gt;
 
-### FP focuses on expressions instead of for-loop statements.
+### [FP focuses on expressions instead of for-loop statements.](https://en.wikipedia.org/wiki/Functional_programming)
+
+---
+
+.pull-left[
+
+```r
+x &lt;- 1:12
+ma_x1 &lt;- double(length = length(x) - 1)
+for (i in seq_along(ma_x1)) {
+* ma_x1[i] &lt;- mean(x[i:(i + 1)])
+}
+ma_x1
+```
+
+```
+#&gt;  [1]  1.5  2.5  3.5  4.5  5.5  6.5
+#&gt;  [7]  7.5  8.5  9.5 10.5 11.5
+```
+
+```r
+ma_x2 &lt;- double(length = length(x) - 2)
+for (i in seq_along(ma_x2)) {
+* ma_x2[i] &lt;- mean(x[i:(i + 2)])
+}
+ma_x2
+```
+
+```
+#&gt;  [1]  2  3  4  5  6  7  8  9 10 11
+```
+]
+.pull-right[
+.bottom[
+### ⬅️ For loops
+]
+]
+
+---
+
+.pull-left[
+
+```r
+x &lt;- 1:12
+ma_x1 &lt;- double(length = length(x) - 1)
+for (i in seq_along(ma_x1)) {
+* ma_x1[i] &lt;- mean(x[i:(i + 1)])
+}
+ma_x1
+```
+
+```
+#&gt;  [1]  1.5  2.5  3.5  4.5  5.5  6.5
+#&gt;  [7]  7.5  8.5  9.5 10.5 11.5
+```
+
+```r
+ma_x2 &lt;- double(length = length(x) - 2)
+for (i in seq_along(ma_x2)) {
+* ma_x2[i] &lt;- mean(x[i:(i + 2)])
+}
+ma_x2
+```
+
+```
+#&gt;  [1]  2  3  4  5  6  7  8  9 10 11
+```
+]
+.pull-right[
+
+```r
+slide_dbl(x, ~ mean(.), .size = 2)
+```
+
+```
+#&gt;  [1]   NA  1.5  2.5  3.5  4.5  5.5
+#&gt;  [7]  6.5  7.5  8.5  9.5 10.5 11.5
+```
+
+```r
+slide_dbl(x, ~ mean(.), .size = 3)
+```
+
+```
+#&gt;  [1] NA NA  2  3  4  5  6  7  8  9
+#&gt; [11] 10 11
+```
+.bottom[
+### ⬆️ Functionals
+]
+]
+
+---
+
+.left-column[
+## .center[🕵️‍♀️]
+## .center[👩‍💻]
+## .center[👩‍🔬]
+## .center[👩‍🎨]
+## .center[👩‍🚒]
+## .center[👩‍🚀]
+## .center[🦸‍♀️]
+## .center[🧙‍♀️]
+]
+.right-column[
+&lt;details open="open"&gt;
+&lt;summary&gt;Rolling window animation&lt;/summary&gt;
+&lt;img src="https://tsibble.tidyverts.org/reference/figures/animate-1.gif" align="center" /&gt;
+&lt;/details&gt;
+]
 
 ---
 
@@ -708,6 +838,71 @@ class: center middle
 &lt;img src="img/tsibble.png", height = "220px"&gt;
 
 ## The future is around the corner.
+
+---
+
+background-image: url(img/tsibble-model.png)
+background-size: 70%
+background-position: 91% 38%
+
+.left-column[
+## .center[Takeaway]
+]
+.right-column[
+.animated.slower.rollIn.delay-1s[
+.pipeline[&lt;img src="img/tsibble.png", height = "150px"&gt;]
+]
+]
+
+### .bottom[.center[Tsibble provides &lt;br&gt; fundamental computing infrastructure.]]
+
+---
+
+.pull-left[
+
+```r
+# transform
+web_mth &lt;- web_ts %&gt;% 
+  index_by(YearMonth = yearmonth(Date)) %&gt;% 
+  summarise(Users = sum(Users))
+
+# model and forecast
+web_fcast &lt;- web_mth %&gt;% 
+  model(ets = ETS(Users)) %&gt;% 
+  forecast(h = 9) %&gt;% 
+  mutate(type = "forecast")
+
+# visualise
+web_mth %&gt;% 
+  mutate(type = "data") %&gt;% 
+  rbind(web_fcast) %&gt;% 
+  group_by(type) %&gt;% 
+  index_by(Year = year(YearMonth)) %&gt;% 
+  summarise(Users = sum(Users)) %&gt;% 
+  mutate(type = fct_rev(type)) %&gt;% 
+  ggplot(aes(x = Year, y = Users, fill = type)) +
+  geom_col()
+```
+]
+.pull-right[
+.top[&lt;img src="img/website.png", height = "80px"&gt;]
+&lt;br&gt;
+### 🔮 Where am I heading?
+
+&lt;img src="figure/web-fcast-1.svg" style="display: block; margin: auto;" /&gt;
+]
+
+---
+
+class: inverse middle
+
+# &lt;i class="fas fa-step-backward"&gt;&lt;/i&gt; Calendar-based graphics
+
+---
+
+class: inverse middle
+
+# &lt;i class="fas fa-step-forward"&gt;&lt;/i&gt; Missingness in time
 
 ---
 
@@ -729,7 +924,7 @@ class: middle
 🏆 2019 John Chambers Statistical Software Award from ASA Section on Statistical Computing
 ]
 .pull-right[
-Total downloads, as of 2019-03-20
+Total downloads, as of 2019-03-21
 &lt;img src="figure/software-impact-1.svg" style="display: block; margin: auto;" /&gt;
 ]
 
@@ -754,11 +949,12 @@ class: middle
 #&gt; 1 .                                                     
 #&gt; 2  ¦--DESCRIPION # Lists of packages used for thesis    
 #&gt; 3  ¦--scripts/   # R code for analysis                  
-#&gt; 4  ¦--Rmd/       # R Markdown for thesis document       
-#&gt; 5  ¦--data/      # Cleaned data used for thesis document
-#&gt; 6  ¦--data-raw/  # Raw data and scripts to clean data   
-#&gt; 7  ¦--Dockerfile                                        
-#&gt; 8  °--...
+#&gt; 4  ¦--R/         # Reusable R functions                 
+#&gt; 5  ¦--Rmd/       # R Markdown for thesis document       
+#&gt; 6  ¦--data/      # Cleaned data used for thesis document
+#&gt; 7  ¦--data-raw/  # Raw data and scripts to clean data   
+#&gt; 8  ¦--Dockerfile                                        
+#&gt; 9  °--...
 ```
 
 

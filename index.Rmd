@@ -104,6 +104,27 @@ background-size: 75%
 
 ---
 
+class: middle
+
+background-image: url(img/model-forecast.png)
+background-size: 75%
+
+.pull-left[
+]
+.pull-right[
+.card[
+`r emo::ji("thinking")` Should all forecasting students be programmers?
+]
+
+.rotate-45[
+.center[
+## NO!
+]
+]
+]
+
+---
+
 class: inverse middle
 
 # What are ~~messy~~ tidy tools?
@@ -144,9 +165,9 @@ class: middle
 ```r
 marathon %>% 
   model(
-    linear = TSLM(Minutes ~ trend()),
-    exponential = TSLM(log(Minutes) ~ trend()),
-    piecewise = TSLM(Minutes ~ trend(knots = c(1940, 1980)))
+*   linear = TSLM(Minutes ~ trend()),
+*   exponential = TSLM(log(Minutes) ~ trend()),
+*   piecewise = TSLM(Minutes ~ trend(knots = c(1940, 1980)))
   ) %>% 
   forecast(h = 10)
 ```
@@ -173,7 +194,7 @@ class: inverse middle
 
 --
 
-### .center[Behind fluent workflow is tidy data.]
+### .center[Behind fluent workflow is [tidy data](https://tidyr.tidyverse.org/articles/tidy-data.html).]
 
 ---
 
@@ -227,7 +248,7 @@ background-position: 91% 38%
 ## .center[Welcome <br> to <br> the tidyver.red[ts]]
 ]
 .right-column[
-.animated.slower.rollIn[
+.animated.slower.rollIn.delay-3s[
 .pipeline[<img src="img/tsibble.png", height = "150px">]
 ]
 ]
@@ -295,7 +316,7 @@ Time indices provide a contextual basis for temporal data.
 
 * acknowledge the diversity of time representations
 * respect time zones
-* allow regular/irregular interval
+* allow regular/irregular intervals
 ]
 .pull-right[
 ### .brown[2.] Key
@@ -311,7 +332,7 @@ Key identifies observational units recorded over time.
 
 class: middle
 
-## Creating a tsibble
+## Declare a tsibble
 
 .pull-left[
 ```{r web-tsibble, echo = TRUE}
@@ -386,7 +407,7 @@ class: inverse middle
 
 <hr>
 
-### Good fluent APIs take a while to build.
+### [Good fluent APIs take a while to build.](https://martinfowler.com/bliki/FluentInterface.html)
 
 ---
 
@@ -448,26 +469,26 @@ tidyverse::tidyverse_logo()
 ---
 
 .pull-left[
-<img src="img/tsibble.png" height=80px>
-```{r web-tsibble-select, echo = TRUE, message = TRUE}
+<img src="https://github.com/rstudio/hex-stickers/blob/master/PNG/tidyverse.png?raw=true", height = "80px">
+```{r web-dplyr-select, echo = TRUE}
 ```
 ]
 .pull-right[
-<img src="https://github.com/rstudio/hex-stickers/blob/master/PNG/tidyverse.png?raw=true", height = "80px">
-```{r web-dplyr-select, echo = TRUE}
+<img src="img/tsibble.png" height=80px>
+```{r web-tsibble-select, echo = TRUE, message = TRUE}
 ```
 ]
 
 ---
 
 .pull-left[
-<img src="img/tsibble.png" height=80px>
-```{r web-tsibble-summarise, echo = TRUE}
+<img src="https://github.com/rstudio/hex-stickers/blob/master/PNG/tidyverse.png?raw=true", height = "80px">
+```{r web-dplyr-summarise, echo = TRUE}
 ```
 ]
 .pull-right[
-<img src="https://github.com/rstudio/hex-stickers/blob/master/PNG/tidyverse.png?raw=true", height = "80px">
-```{r web-dplyr-summarise, echo = TRUE}
+<img src="img/tsibble.png" height=80px>
+```{r web-tsibble-summarise, echo = TRUE}
 ```
 ]
 
@@ -475,7 +496,7 @@ tidyverse::tidyverse_logo()
 
 .top[<img src="img/website.png", height = "80px">]
 
-## Compose a prose
+## Compose prose
 
 .pull-left[
 ```{r web-year, echo = TRUE, results = "hide"}
@@ -513,7 +534,67 @@ class: inverse middle
 
 <hr>
 
-### FP focuses on expressions instead of for-loop statements.
+### [FP focuses on expressions instead of for-loop statements.](https://en.wikipedia.org/wiki/Functional_programming)
+
+---
+
+.pull-left[
+```{r for-loop, echo = -1}
+options(width = 35)
+x <- 1:12
+ma_x1 <- double(length = length(x) - 1)
+for (i in seq_along(ma_x1)) {
+  ma_x1[i] <- mean(x[i:(i + 1)]) #<<
+}
+ma_x1
+ma_x2 <- double(length = length(x) - 2)
+for (i in seq_along(ma_x2)) {
+  ma_x2[i] <- mean(x[i:(i + 2)]) #<<
+}
+ma_x2
+```
+]
+.pull-right[
+.bottom[
+### `r emo::ji("arrow_left")` For loops
+]
+]
+
+---
+
+.pull-left[
+```{r for-loop, echo = -1}
+```
+]
+.pull-right[
+```{r echo = -1}
+options(width = 35)
+slide_dbl(x, ~ mean(.), .size = 2)
+slide_dbl(x, ~ mean(.), .size = 3)
+```
+.bottom[
+### `r emo::ji("arrow_up")` Functionals
+]
+]
+
+---
+
+.left-column[
+## .center[`r emo::ji("female_detective")`]
+## .center[`r emo::ji("woman_technologist")`]
+## .center[`r emo::ji("woman_scientist")`]
+## .center[`r emo::ji("woman_artist")`]
+## .center[`r emo::ji("woman_firefighter")`]
+## .center[`r emo::ji("woman_astronaut")`]
+## .center[`r emo::ji("woman_superhero")`]
+## .center[`r emo::ji("sorceress")`]
+]
+.right-column[
+<details open="open">
+<summary>Rolling window animation</summary>
+<img src="https://tsibble.tidyverts.org/reference/figures/animate-1.gif" align="center" />
+</details>
+]
 
 ---
 
@@ -522,6 +603,50 @@ class: center middle
 <img src="img/tsibble.png", height = "220px">
 
 ## The future is around the corner.
+
+---
+
+background-image: url(img/tsibble-model.png)
+background-size: 70%
+background-position: 91% 38%
+
+.left-column[
+## .center[Takeaway]
+]
+.right-column[
+.animated.slower.rollIn.delay-1s[
+.pipeline[<img src="img/tsibble.png", height = "150px">]
+]
+]
+
+### .bottom[.center[Tsibble provides <br> fundamental computing infrastructure.]]
+
+---
+
+.pull-left[
+```{r web-fcast, echo = TRUE, fig.show = "hide"}
+```
+]
+.pull-right[
+.top[<img src="img/website.png", height = "80px">]
+<br>
+### `r emo::ji("crystal_ball")` Where am I heading?
+
+```{r web-fcast, fig.height = 8}
+```
+]
+
+---
+
+class: inverse middle
+
+# <i class="fas fa-step-backward"></i> Calendar-based graphics
+
+---
+
+class: inverse middle
+
+# <i class="fas fa-step-forward"></i> Missingness in time
 
 ---
 
@@ -578,6 +703,7 @@ library(data.tree)
 root <- Node$new(".")
 desc <- root$AddChild("DESCRIPION # Lists of packages used for thesis")
 scripts <- root$AddChild("scripts/   # R code for analysis")
+r <- root$AddChild("R/         # Reusable R functions")
 rmd <- root$AddChild("Rmd/       # R Markdown for thesis document")
 data <- root$AddChild("data/      # Cleaned data used for thesis document")
 data_raw <- root$AddChild("data-raw/  # Raw data and scripts to clean data")

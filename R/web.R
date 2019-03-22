@@ -51,22 +51,24 @@ web_year %>%
   geom_col()
 
 ## ---- web-fcast
+# transform
 web_mth <- web_ts %>% 
   index_by(YearMonth = yearmonth(Date)) %>% 
   summarise(Users = sum(Users))
 
+# model and forecast
 web_fcast <- web_mth %>% 
   model(ets = ETS(Users)) %>% 
   forecast(h = 9) %>% 
-  as_tsibble() %>% 
   mutate(type = "forecast")
 
+# visualise
 web_mth %>% 
   mutate(type = "data") %>% 
   rbind(web_fcast) %>% 
-  mutate(type = fct_rev(type)) %>% 
   group_by(type) %>% 
   index_by(Year = year(YearMonth)) %>% 
   summarise(Users = sum(Users)) %>% 
+  mutate(type = fct_rev(type)) %>% 
   ggplot(aes(x = Year, y = Users, fill = type)) +
   geom_col()
