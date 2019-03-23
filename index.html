@@ -31,6 +31,10 @@ class: middle
 &gt; Data analysis is a process of .orange[inspecting], .orange[cleansing], .orange[transforming], and .orange[modeling] data with the goal of discovering useful information, informing conclusions, and supporting decision-making. &lt;br&gt;
 --- [Wikipedia](https://en.wikipedia.org/wiki/Data_analysis)
 
+???
+
+There is a great amount of variation in defining what is a data analysis. According to Wikipedia, data analysis is a process: inspecting, cleansing, transforming, and modelling. And out of this process, we'll learn some knowledge and insights from the data, and make some decisions.
+
 ---
 
 class: middle
@@ -38,11 +42,21 @@ class: middle
 &gt; .orange[Temporal data analysis] is a process of inspecting, cleansing, transforming, and modeling .orange[time-indexed] data with the goal of discovering useful information, informing conclusions, and supporting decision-making .orange[related to time]. &lt;br&gt;
 --- [EaroWiki](https://earo.me)
 
+???
+
+How about temporal data analysis? We still go through the same process, but the data dealt with is time-indexed data. The decisions we're going to make are somehow related to time.
+
+But in order to conduct this process and analyse the data, we need tools. There are many tools out there. We have to carefully choose the good ones to lubricate this process as smoothly as possible. This set of tools, we call them "tidy tools".
+
 ---
 
 class: inverse middle
 
 # What are .barcode[messy] tools?
+
+???
+
+Before introducing you tidy tools, I'd like to show you an example of what messy tools are.
 
 ---
 
@@ -66,8 +80,7 @@ background-size: 75%
 
 ???
 
-* verbose but distracting
-* focus on code but not the idea
+This is a slide that I took from last year's Applied forecasting unit taught by Rob. I'm going say this is the messy tools' example. (Sorry, Rob) It's about fitting three regressions on one data set but with different time trends as regressors. The first two code blocks are straightforward: the first one is linear trend and then forecast 10 steps ahead; the second is exponential trend by taking a log transformation on the response variable using `lambda = 0` and then forecast. But the third one looks a bit horrified. The actual idea is simple, fitting a piecewise linear trend. Clearly this `tslm()` doesn't incorporate the piecewise case. So both the lecturer and the students get distracted from the modelling idea but have to understand how to implement the algorithm first. More importantly, this piece of code is very ad hoc. A few tweaks needed for a different data set, and there's possibility to invite mistakes.
 
 ---
 
@@ -83,6 +96,10 @@ background-size: 75%
 🤔 Should all forecasting students be programmers?
 ]
 ]
+
+???
+
+This makes me wonder if students should become programmers first before they can become forecasters.
 
 ---
 
@@ -100,16 +117,28 @@ background-size: 75%
 
 .rotate-45[
 .center[
-## NO!
+## [NO!](https://speakerdeck.com/hadley/should-all-statistics-students-be-programmers)
 ]
 ]
 ]
+
+???
+
+No!
+
+They do have to know how to program to do data analysis. But they don't have to be programmers. Particularly it's not the purpose of that unit.
+
+Now I hope you get a sense of what are messy tools. In terms of sensation, messy tools are smelly.
 
 ---
 
 class: inverse middle
 
 # What are ~~messy~~ tidy tools?
+
+???
+
+Contrasting to messy tools, they are tidy tools.
 
 ---
 
@@ -133,8 +162,11 @@ background-size: 75%
 
 ???
 
-* focus on the idea not the code
-* focus on the data and expressiveness
+This year, Rob is going to teach the same materials but use a different set of tools. You can see the code is clean and succinct: the lines have been reduced more than half.
+
+Most importantly, it helps to communicate the modelling idea in a very clear way. We are going to model this data with three linear regressions. It also addresses the difference between piecewise and a linear trend is adding knots. Once we're done with model fitting, we forecast them as a whole.
+
+What has been abstracted away is computational implementations and put more emphasis on ideas and expressions. Cognitive loads have been lessened for both teaching and learning. The door for introducing mistakes is closed. This is what we call "tidy tools". (Well done, Rob)
 
 ---
 
@@ -153,6 +185,14 @@ marathon %&gt;%
   ) %&gt;% 
   forecast(h = 10)
 ```
+
+???
+
+This is what I think about "tidy tools":
+
+1. Tidy tools are accessible. It means anyone can run this bit of code, anywhere anytime, to produce identical results. There shouldn't be a paywall to prevent users from using it. The source code can be inspected by others as well.
+2. Tidy tools are expressive. Tidy tools are code, and code is text. We can express our ideas in text and we can frame our data analysis problems through code. It's documentation, documenting how we approach the problem. We can easily share across different platforms and groups of people. This goes beyond what point and click software can do. Yes, it is R code. But I believe someone who never used R before, they should be able to quickly get what's happening here. This is the power of expressiveness.
+3. Tidy tools are pipeable. Because the input format is the same as the output format. We can chain these operations together to build a fluent pipeline. Modelling and then forecasting. It makes possible to have fluent workflow.
 
 ---
 
@@ -896,13 +936,26 @@ web_mth %&gt;%
 
 class: inverse middle
 
-# &lt;i class="fas fa-step-backward"&gt;&lt;/i&gt; Calendar-based graphics
+# .blue[&lt;i class="fas fa-step-backward"&gt;&lt;/i&gt;] Calendar-based graphics
+
+---
+
+class: middle
+
+## Showcase
+
+.pull-left[
+&lt;img src="https://pbs.twimg.com/media/DSKO3xMUEAAZ8Ga.jpg", width = "100%"&gt;
+]
+.pull-right[
+&lt;img src="https://pbs.twimg.com/media/DU0d5cVVAAA7OWw.jpg", width = "100%"&gt;
+]
 
 ---
 
 class: inverse middle
 
-# &lt;i class="fas fa-step-forward"&gt;&lt;/i&gt; Missingness in time
+# .blue[&lt;i class="fas fa-step-forward"&gt;&lt;/i&gt;] Missingness in time
 
 ---
 
@@ -924,7 +977,7 @@ class: middle
 🏆 2019 John Chambers Statistical Software Award from ASA Section on Statistical Computing
 ]
 .pull-right[
-Total downloads, as of 2019-03-21
+Total downloads, as of 2019-03-22
 &lt;img src="figure/software-impact-1.svg" style="display: block; margin: auto;" /&gt;
 ]
 
@@ -1035,7 +1088,8 @@ class: inverse middle center
 "ratio": "16:9",
 "highlightStyle": "github",
 "highlightLines": true,
-"countIncrementalSlides": false
+"countIncrementalSlides": false,
+"slideNumberFormat": "<div class=\"progress-bar-container\">   <div class=\"progress-bar\" style=\"width: calc(%current% / %total% * 100%);\">   </div> </div>"
 });
 if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
   window.dispatchEvent(new Event('resize'));
