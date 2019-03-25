@@ -103,7 +103,11 @@ background-size: 75%
 
 ???
 
-This is a slide that I took from last year's Applied forecasting unit taught by Rob. I'm going say this is the messy tools' example. (Sorry, Rob) It's about fitting three regressions on one data set but with different time trends as regressors. The first two code blocks are straightforward: the first one is linear trend and then forecast 10 steps ahead; the second is exponential trend by taking a log transformation on the response variable using `lambda = 0` and then forecast. But the third one looks a bit horrified. The actual idea is simple, fitting a piecewise linear trend. Clearly this `tslm()` doesn't incorporate the piecewise case. So both the lecturer and the students get distracted from the modelling idea but have to understand how to implement the algorithm first. More importantly, this piece of code is very ad hoc. A few tweaks needed for a different data set, and there's possibility to invite mistakes.
+This is a slide that I took from last year's Applied forecasting unit taught by Rob. I'm going say this is the messy tools' example. (Sorry, Rob)
+
+It's about fitting three regressions on one data set but with different time trends as regressors. The first two code blocks are straightforward: the first one is linear trend and then forecast 10 steps ahead; the second is exponential trend by taking a log transformation on the response variable but using `lambda = 0` and then forecast.
+
+But the third one looks a bit horrified. The actual idea is simple, fitting a piecewise linear trend. Clearly this `tslm()` doesn't incorporate the piecewise case. So both the lecturer and the students get distracted from the modelling idea but have to understand how to implement the algorithm first. More importantly, this piece of code is very ad hoc. A few tweaks needed for a different data set, and there's possibility to invite mistakes.
 
 ---
 
@@ -147,7 +151,7 @@ background-size: 75%
 
 ???
 
-No!
+Definitely not!
 
 They do have to know how to program to do data analysis. But they don't have to be programmers. Particularly it's not the purpose of that unit.
 
@@ -185,11 +189,11 @@ background-size: 75%
 
 ???
 
-This year, Rob is going to teach the same materials but use a different set of tools. You can see the code is clean and succinct: the lines have been reduced more than half.
+This year, Rob is going to teach the same materials but use a different set of tools. You can see the code is clean and succinct.
 
-Most importantly, it helps to communicate the modelling idea in a very clear way. We are going to model this data with three linear regressions. It also addresses the difference between piecewise and a linear trend is adding knots. Once we're done with model fitting, we forecast them as a whole.
+Most importantly, it helps to communicate the modelling idea in a very clear way. We are going to model this data with three linear regressions. It also addresses the difference between piecewise and a linear trend is by adding knots. Once we're done with model fitting, we forecast them as a whole.
 
-What has been abstracted away is computational implementations and put more emphasis on ideas and expressions. Cognitive loads have been lessened for both teaching and learning. The door for introducing mistakes is closed. This is what we call "tidy tools". (Well done, Rob)
+What has been abstracted away is computational implementations and put more emphasis on ideas and expressions. It makes teaching easier and more fun. The door for introducing mistakes is closed. This set of tools are "tidy tools". (Good job, Rob)
 
 ---
 
@@ -211,11 +215,11 @@ marathon %>%
 
 ???
 
-This is what I think about "tidy tools":
+This is my understanding about "tidy tools":
 
 1. Tidy tools are accessible. It means anyone can run this bit of code, anywhere anytime, to produce identical results. There shouldn't be a paywall to prevent users from using it. The source code can be inspected by others as well.
-2. Tidy tools are expressive. Tidy tools are code, and code is text. We can express our ideas in text and we can frame our data analysis problems through code. It's documentation, documenting how we approach the problem. We can easily share across different platforms and groups of people. This goes beyond what point and click software can do. Yes, it is R code. But I believe someone who never used R before, they should be able to quickly get what's happening here. This is the power of expressiveness.
-3. Tidy tools are pipeable. Because the input format is the same as the output format. We can chain these operations together to build a fluent pipeline. Modelling and then forecasting. It makes possible to have fluent workflow.
+2. Tidy tools are expressive. Tidy tools are code, and code is text. We can express our ideas in text and we can frame our data analysis problems through code. Code is documentation, documenting how we approach the problem. We can easily share plain text across different platforms and groups of people. This goes beyond what point and click software can do. Yes, it is R code. But I believe someone who never used R before, they should be able to quickly get what's happening here. This is the power of expressiveness.
+3. Tidy tools are pipeable. Because the input format is the consistent with the output format. We can chain these operations together to build a fluent pipeline and read more naturally. Modelling and then forecasting. It makes possible to have fluent workflow.
 
 ---
 
@@ -237,9 +241,21 @@ class: inverse middle
 <img src="img/tidy-model.png", width = "100%">
 ]
 
---
-
 ### .center[Behind fluent workflow is [tidy data](https://tidyr.tidyverse.org/articles/tidy-data.html).]
+
+???
+
+Data analysis is a process, particularly it's an iterative process.
+
+The tidyverse is a collection of R packages to help with this process quick and tidy.
+
+Why it's important? Before deploying the final model into the production stage, we need to repeat this process many many times. If this model doesn't work, we make some tweaks, and then fit another model. We want this iteration as rapid as possible.
+
+In addition to tidy tools, what's underlying this fluent workflow is tidy data.
+
+The "tidy" stage doesn't mean data cleaning, but refers to making the data in a right shape, a uniform shape that is shared by these three stages in this circle.
+
+With the tidyverse, we have such a fluent pipeline to handle data analysis. But when you have time series data and want to do time series analysis ...
 
 ---
 
@@ -255,6 +271,14 @@ class: inverse middle
 ]
 
 ### .center[WAT!`r emo::ji("scream")`]
+
+???
+
+This is what you experience.
+
+Small data lives in csv files, big data stays in database. But most time, the form of the data at the "import" stage deviates a lot from the current time series objects that are designed for modelling. When doing transformation and visualisation, different data shapes are expected. We do not have a uniform shape for lubricating this process for time series. There's no formal guidance how to reshape the data for modelling purpose.
+
+Screaming out "WAT" is the natural response to this workflow. Let me share my "WAT" moment.
 
 ---
 
@@ -283,6 +307,14 @@ for (i in 1L:length(ltraffics)) {
 ```
 ]
 
+???
+
+When I was doing my honours project years agos, I needed to compute a bunch of time series features on yahoo web traffic data. 
+
+The script shows I put multiple csvs into a big time series matrix. But it took me a while to understand what past me was doing.
+
+When I revisit this code, I started to realise there's something fundamentally wrong here. Multiple observational units and multiple measurements have been put into one object, which isn't appropriate for the traditional time series structure.
+
 ---
 
 background-image: url(img/tsibble-model.png)
@@ -300,11 +332,23 @@ background-position: 91% 38%
 
 ### .bottom[.center[Tsibble defines tidy data in temporal context.]]
 
+???
+
+So my work is going to smooth out those rough edges and fill the gap of tidy data in temporal context. We're going to call this new data structure---"tsibble".
+
+You know I'm serious about this work, bc it has a logo.
+
+Next I'm going to demonstrate this whole data process with tsibble and showcase the value of it.
+
 ---
 
 class: inverse middle
 
-# Data analysis <br> doesn't make sense <br> without data.
+# .orange[Temporal] data analysis <br> doesn't make sense <br> without .orange[time-indexed] data.
+
+???
+
+Data analysis cannot live w/o data.
 
 ---
 
@@ -323,6 +367,12 @@ class: center middle
 ### Airline traffic in the US
 ]
 
+???
+
+I'm going to share with you two data stories simultaneously.
+
+The LHS is daily users visiting my personal website <earo.me>. I own this domain and the website since 2012. The RHS is on-time performance for domestic airlines in the States. One personal, one national. One small data, and one big data.
+
 ---
 
 .pull-left[
@@ -332,11 +382,23 @@ class: center middle
 ```
 ]
 .pull-right[
-### Airline
+### Airline traffic
 
 ```{r load-flights}
 ```
 ]
+
+???
+
+How the data looks like?
+
+My data is quite simple, with 1000 obs and 2 variables. The `Date` column provides the time context. and how many visitors.
+
+This data starts from the day when I started my PhD until yesterday. It has a sad beginning that nobody visited my website in the early days.
+
+On the other hand, airline data contains 5M obs and 22 variables. The `sched_dep_datetime` column gives the date-times. Other variables include the meta info describing the flights and on-time performance metrics. It is an event data set.
+
+They already arrived in the tidy shape, with clearly defined observations and variables. Now we need to declare them as temporal data using tsibble.
 
 ---
 
@@ -348,6 +410,14 @@ class: inverse middle
 
 <img src="img/tsibble-semantics.png", height = "120px">
 
+???
+
+Tsibble is a multi-faceted product.
+
+First of all, tsibble represents tidy temporal data.
+
+A tsibble has to be tidy data first. Data is organised in the common rectangular form: each row is an observation; each column holds a variable. But temporal data is more of a contextual data object. So on top of the tidy data, column variables require more meanings: index for time support, key for defining identities over time, and the rest are measurements.
+
 ---
 
 .top[<img src="img/tsibble-semantics.png", height = "80px">]
@@ -355,7 +425,7 @@ class: inverse middle
 ## Contextual semantics
 
 .pull-left[
-### .brown[1.] Index
+### .brown[1.] Index <i class="far fa-clock"></i>
 
 Time indices provide a contextual basis for temporal data.
 
@@ -364,7 +434,7 @@ Time indices provide a contextual basis for temporal data.
 * allow regular/irregular intervals
 ]
 .pull-right[
-### .brown[2.] Key
+### .brown[2.] Key <i class="fas fa-users"></i>
 
 Key identifies observational units recorded over time.
 
@@ -372,6 +442,20 @@ Key identifies observational units recorded over time.
 * known a priori by analysts
 * determine unique time indices
 ]
+
+???
+
+Let me elaborate index and key more.
+
+The index variable consists of time indices that provide a contextual basis for temporal data.
+
+A variety of time represenations exist in the wild, the common ones you saw before, dates and date-times, as well as intradays and intervals from one time point to another. Tsibble supports all of them, as long as they can be ordered from past to future.
+
+Unlike other time series objects, tsibble respects time zones, will not ignore them and not convert them to UTC. 
+
+Temporal data can be regular and irregularly spaced in time.
+
+And the key can consist of empty, one or more variables. It is typically known for analysts. Each observational unit in the key, only allows unique time indices.
 
 ---
 
@@ -388,6 +472,10 @@ web_ts
 ```
 
 ]
+
+???
+
+Can these two data sets meet the tsibble definition in the first instance?
 
 --
 
@@ -454,6 +542,12 @@ class: inverse middle
 
 ### [Good fluent APIs take a while to build.](https://martinfowler.com/bliki/FluentInterface.html)
 
+???
+
+Naming a function is difficult.
+
+I like a verb that describes the software development is "craft".
+
 ---
 
 .pull-left[
@@ -478,6 +572,12 @@ class: inverse middle
 * `pull_interval()`
 * `new_tsibble()`
 ]
+
+???
+
+4 blocks of functions
+
+Each focuses on doing one little thing and doing it well.
 
 ---
 
@@ -639,15 +739,22 @@ slide_dbl(x, ~ mean(.), .size = 3)
 <summary>Rolling window animation</summary>
 <img src="https://tsibble.tidyverts.org/reference/figures/animate-1.gif" align="center" />
 </details>
+
+<br>
+* as simple as moving average calculation
+* as complex as rolling model fitting
+* time series cross validation
+* arbitrary types of inputs & outputs
+* parallel processing
 ]
 
 ---
 
-class: center middle
+class: middle center
 
-<img src="img/tsibble.png", height = "220px">
+<img src="img/tsibble.png", height = "250px"><img src="img/fable.png", height = "250px">
 
-## The future is around the corner.
+## The future is just around the corner.
 
 ---
 
@@ -673,12 +780,12 @@ background-position: 91% 38%
 ```
 ]
 .pull-right[
-.top[<img src="img/website.png", height = "80px">]
+.top[<img src="img/understand.png", height = "120px">]
 <br>
-### `r emo::ji("crystal_ball")` Where am I heading?
-
-```{r web-fcast, fig.height = 8}
-```
+<details>
+<summary>Where am I heading?</summary>
+<img src="img/xkcd-bar.gif", width = "100%">
+</details>
 ]
 
 ---
@@ -689,14 +796,14 @@ class: inverse middle
 
 ---
 
-class: middle
-
 ## Showcase
 
 .pull-left[
+### .center[Everyday running path]
 <img src="https://pbs.twimg.com/media/DSKO3xMUEAAZ8Ga.jpg", width = "100%">
 ]
 .pull-right[
+### .center[Auckland bus delay]
 <img src="https://pbs.twimg.com/media/DU0d5cVVAAA7OWw.jpg", width = "100%">
 ]
 
@@ -704,7 +811,18 @@ class: middle
 
 class: inverse middle
 
-# .blue[<i class="fas fa-step-forward"></i>] Missingness in time
+# Missingness in time .blue[<i class="fas fa-step-forward"></i>]
+
+---
+
+.left-column[
+## .center[Types <br> of <br> missings in time]
+]
+.right-column[
+.center[
+<img src="img/miss-types-1.png", width = "70%">
+]
+]
 
 ---
 
@@ -760,6 +878,7 @@ class: middle
 library(data.tree)
 root <- Node$new(".")
 desc <- root$AddChild("DESCRIPION # Lists of packages used for thesis")
+readme <- root$AddChild("README.md  # Instructions on package's installation and etc.")
 scripts <- root$AddChild("scripts/   # R code for analysis")
 r <- root$AddChild("R/         # Reusable R functions")
 rmd <- root$AddChild("Rmd/       # R Markdown for thesis document")
@@ -801,7 +920,7 @@ class: inverse
 Di
 ]
 .portrait[
-![](https://robjhyndman.com/img/rjh.png)
+![](https://pbs.twimg.com/profile_images/1103150025981321216/dV3Wz_ql_400x400.png)
 Rob
 ]
 <br>
@@ -810,7 +929,7 @@ Rob
 Heike
 ]
 .portrait[
-![](https://mitchelloharawild.com/img/circle.jpg)
+![](https://pbs.twimg.com/profile_images/901030601490182145/Un598Dz3_400x400.jpg)
 Mitch
 ]
 .portrait[
