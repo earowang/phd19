@@ -6,7 +6,7 @@ library(tsibble)
 library(fable)
 theme_set(theme_remark())
 
-web <- read_csv("data/website-ga.csv", skip = 5, n_max = 1096) %>% 
+web <- read_csv("data/website-ga.csv", skip = 5, n_max = 1100) %>% 
   mutate(`Day Index` = mdy(`Day Index`)) %>% 
   rename(Date = `Day Index`) %>% 
   print()
@@ -61,7 +61,7 @@ web_fcast <- web_mth %>%
   forecast(h = 9) %>% 
   mutate(type = "forecast")
 # visualise
-p <- web_mth %>% 
+web_mth %>% 
   mutate(type = "data") %>% 
   rbind(web_fcast) %>% 
   group_by(type) %>% 
@@ -125,4 +125,26 @@ p_anim <- web_data %>%
   xkcdman(mapping, dataman) +
   theme_xkcd() +
   transition_manual(group)
-anim_save("xkcd-bar.gif", p_anim, path = "img", nframes = 100, fps = 20, width = 1000, height = 700)
+anim_save("xkcd-bar.gif", p_anim, path = "img", nframes = 100, fps = 20, width = 1000, height = 800)
+
+## ---- calendar-layout
+library(sugrrants)
+pedestrian %>%
+  filter(
+    Sensor_Name %in% c("Flagstaff Station", "Melbourne Convention Exhibition Centre"),
+    Date < as.Date("2016-06-01"), Date >= as.Date("2016-04-01")
+  ) %>% 
+  ggplot(aes(x = Time, y = Hourly_Counts, colour = Sensor_Name)) +
+  facet_calendar(~ Date) +
+  theme(axis.text = element_blank())
+
+## ---- calendar-plot
+pedestrian %>%
+  filter(
+    Sensor_Name %in% c("Flagstaff Station", "Melbourne Convention Exhibition Centre"),
+    Date < as.Date("2016-06-01"), Date >= as.Date("2016-04-01")
+  ) %>% 
+  ggplot(aes(x = Time, y = Hourly_Counts, colour = Sensor_Name)) +
+  geom_line() +
+  facet_calendar(~ Date) +
+  theme(axis.text = element_blank())

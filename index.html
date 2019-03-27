@@ -24,6 +24,10 @@ class: inverse middle
 
 # What is (temporal) data analysis?
 
+???
+
+What is data analysis? and what is temporal data analysis.
+
 ---
 
 class: middle
@@ -84,7 +88,7 @@ This is a slide that I took from last year's Applied forecasting unit taught by 
 
 It's about fitting three regressions on one data set but with different time trends as regressors. The first two code blocks are straightforward: the first one is linear trend and then forecast 10 steps ahead; the second is exponential trend by taking a log transformation on the response variable but using `lambda = 0` and then forecast.
 
-But the third one looks a bit horrified. The actual idea is simple, fitting a piecewise linear trend. Clearly this `tslm()` doesn't incorporate the piecewise case. So both the lecturer and the students get distracted from the modelling idea but have to understand how to implement the algorithm first. More importantly, this piece of code is very ad hoc. A few tweaks needed for a different data set, and there's possibility to invite mistakes.
+But the third one looks a bit horrified, many new functions have been introduced. The actual idea is simple, fitting a piecewise linear trend. Clearly this `tslm()` doesn't incorporate the piecewise case. So both the lecturer and the students get distracted from the modelling idea but have to understand how to implement the algorithm first. More importantly, this piece of code is very ad hoc. A few tweaks needed for a different data set, and there's possibility to invite mistakes while tweaking.
 
 ---
 
@@ -176,9 +180,9 @@ What has been abstracted away is computational implementations and put more emph
 
 class: middle
 
-1. Tidy tools are .orange[accessible].
-2. Tidy tools are .orange[expressive].
-3. Tidy tools are .orange[pipeable].
+1. **Tidy tools are .orange[accessible].**
+2. **Tidy tools are .orange[expressive].**
+3. **Tidy tools are .orange[pipeable].**
 
 ```r
 marathon %&gt;% 
@@ -192,11 +196,11 @@ marathon %&gt;%
 
 ???
 
-This is my understanding about "tidy tools":
+This is my conceptualisation about "tidy tools":
 
 1. Tidy tools are accessible. It means anyone can run this bit of code, anywhere anytime, to produce identical results. There shouldn't be a paywall to prevent users from using it. The source code can be inspected by others as well.
 2. Tidy tools are expressive. Tidy tools are code, and code is text. We can express our ideas in text and we can frame our data analysis problems through code. Code is documentation, documenting how we approach the problem. We can easily share plain text across different platforms and groups of people. This goes beyond what point and click software can do. Yes, it is R code. But I believe someone who never used R before, they should be able to quickly get what's happening here. This is the power of expressiveness.
-3. Tidy tools are pipeable. Because the input format is the consistent with the output format. We can chain these operations together to build a fluent pipeline and read more naturally. Modelling and then forecasting. It makes possible to have fluent workflow.
+3. Tidy tools are pipeable. Because the input format is consistent with the output format. We can chain these operations together to build a fluent pipeline and read more naturally. Modelling and then forecasting. It makes possible to have fluent workflow.
 
 ---
 
@@ -251,7 +255,7 @@ With the tidyverse, we have such a fluent pipeline to handle data analysis. But 
 
 ???
 
-This is what you experience.
+This is what you experience. Lots of you in this department primarily focus on the statistical models. But I have been working on the rest of the process to support modelling.
 
 Small data lives in csv files, big data stays in database. But most time, the form of the data at the "import" stage deviates a lot from the current time series objects that are designed for modelling. When doing transformation and visualisation, different data shapes are expected. We do not have a uniform shape for lubricating this process for time series. There's no formal guidance how to reshape the data for modelling purpose.
 
@@ -302,7 +306,7 @@ background-position: 91% 38%
 ## .center[Welcome &lt;br&gt; to &lt;br&gt; the tidyver.red[ts]]
 ]
 .right-column[
-.animated.slower.rollIn.delay-3s[
+.animated.slower.rollIn.delay-6s[
 .pipeline[&lt;img src="img/tsibble.png", height = "150px"&gt;]
 ]
 ]
@@ -311,7 +315,7 @@ background-position: 91% 38%
 
 ???
 
-So my work is going to smooth out those rough edges and fill the gap of tidy data in temporal context. We're going to call this new data structure---"tsibble".
+So my work is going to smooth out those rough edges, provides a conceptual framework for temporal data analysis, and fill the gap of tidy data in temporal context. We're going to call this new data structure---"tsibble".
 
 You know I'm serious about this work, bc it has a logo.
 
@@ -348,7 +352,7 @@ class: center middle
 
 I'm going to share with you two data stories simultaneously.
 
-The LHS is daily users visiting my personal website &lt;earo.me&gt;. I own this domain and the website since 2012. The RHS is on-time performance for domestic airlines in the States. One personal, one national. One small data, and one big data.
+The LHS is daily users visiting my personal website &lt;earo.me&gt;. I own this domain and the website since 2012. I have a long data history. The RHS is on-time performance for domestic airlines in the States. One personal, one national. One small data, and one big data.
 
 ---
 
@@ -357,7 +361,7 @@ The LHS is daily users visiting my personal website &lt;earo.me&gt;. I own this 
 
 
 ```
-#&gt; # A tibble: 1,096 x 2
+#&gt; # A tibble: 1,100 x 2
 #&gt;   Date       Users
 #&gt;   &lt;date&gt;     &lt;dbl&gt;
 #&gt; 1 2016-03-22     0
@@ -366,7 +370,7 @@ The LHS is daily users visiting my personal website &lt;earo.me&gt;. I own this 
 #&gt; 4 2016-03-25     0
 #&gt; 5 2016-03-26     0
 #&gt; 6 2016-03-27     0
-#&gt; # … with 1,090 more rows
+#&gt; # … with 1,094 more rows
 ```
 ]
 .pull-right[
@@ -410,7 +414,7 @@ My data is quite simple, with 1000 obs and 2 variables. The `Date` column provid
 
 This data starts from the day when I started my PhD until yesterday. It has a sad beginning that nobody visited my website in the early days.
 
-On the other hand, airline data contains 5M obs and 22 variables. The `sched_dep_datetime` column gives the date-times. Other variables include the meta info describing the flights and on-time performance metrics. It is an event data set.
+By contrast, airline data contains 5M obs and 22 variables. The `sched_dep_datetime` column gives the date-times. Other variables include the meta info describing the flights and on-time performance metrics. It is an event data set.
 
 They already arrived in the tidy shape, with clearly defined observations and variables. Now we need to declare them as temporal data using tsibble.
 
@@ -463,13 +467,15 @@ Let me elaborate index and key more.
 
 The index variable consists of time indices that provide a contextual basis for temporal data.
 
-A variety of time represenations exist in the wild, the common ones you saw before, dates and date-times, as well as intradays and intervals from one time point to another. Tsibble supports all of them, as long as they can be ordered from past to future.
+A variety of time representations exist in the wild, the common ones you saw before, dates and date-times, as well as intradays and intervals from one time point to another. Tsibble supports all of them, as long as they can be ordered from past to future.
 
 Unlike other time series objects, tsibble respects time zones, will not ignore them and not convert them to UTC. 
 
-Temporal data can be regular and irregularly spaced in time.
+Temporal data can be regular and irregularly spaced in time. That's why we say tsibble is temporal data instead of time series.
 
 And the key can consist of empty, one or more variables. It is typically known for analysts. Each observational unit in the key, only allows unique time indices.
+
+These features make tsibble a modern re-imagining temporal data.
 
 ---
 
@@ -488,7 +494,7 @@ web_ts &lt;- web %&gt;%
 
 
 ```
-*#&gt; # A tsibble: 1,096 x 2 [1D]
+*#&gt; # A tsibble: 1,100 x 2 [1D]
 #&gt;   Date       Users
 #&gt;   &lt;date&gt;     &lt;dbl&gt;
 #&gt; 1 2016-03-22     0
@@ -497,7 +503,7 @@ web_ts &lt;- web %&gt;%
 #&gt; 4 2016-03-25     0
 #&gt; 5 2016-03-26     0
 #&gt; 6 2016-03-27     0
-#&gt; # … with 1,090 more rows
+#&gt; # … with 1,094 more rows
 ```
 
 ]
@@ -505,6 +511,10 @@ web_ts &lt;- web %&gt;%
 ???
 
 Can these two data sets meet the tsibble definition in the first instance?
+
+Since the web traffic is a univariate series, just about me. So the key is empty. And the index is `Date`.
+
+Now it's a tsibble object with 1 day interval.
 
 --
 
@@ -527,6 +537,18 @@ index.
 the duplicated rows.```
 ### .red[Oops!]
 ]
+
+???
+
+How about the airline data?
+
+From the passenger's point of view, we're interested in flight number at its scheduled departure time. Also it's irregular interval.
+
+After declaring key and index. Oops! We got an error.
+
+The error says: ... and suggests ...
+
+Another way to interpret this error message is that this data may have data quality issue.
 
 ---
 
@@ -554,6 +576,14 @@ flights %&gt;%
 #&gt; #   weather_delay &lt;dbl&gt;, nas_delay &lt;dbl&gt;, security_delay &lt;dbl&gt;,
 #&gt; #   late_aircraft_delay &lt;dbl&gt;
 ```
+
+???
+
+We need to search for those duplicates and fix them.
+
+As you can see, we've got two problematic entries. The flight number `NK630` has been scheduled twice at the same departure time. They have identical arrival time, departure delay, arrival delay, and carrier. But they are different in tail number, origin and destination. After researching this flight number and going through the whole database, my decision is to remove the highlighted entry: the flight from LAX to DEN, bc this flight doesn't operate on this route.
+
+Tsibble is strict on tidy data.
 
 ---
 
@@ -589,9 +619,23 @@ flights_ts &lt;- flights %&gt;%
 #&gt; #   late_aircraft_delay &lt;dbl&gt;
 ```
 
+???
+
+Once we remove the duplicated observation, we are all good.
+
+Irregular time space is marked by exclamation mark. and we've got 22 thousands of flights or series in the table.
+
 ---
 
 &lt;img src="img/tsibble-pipeline.png" height=580px&gt;
+
+???
+
+When creating a tsibble object, we're also going through the tidy stage. Tsibble complains early when the data involves duplicates, like the flights data. We need to find the duplicates and fix them. We now end up with a properly-defined temporal data.
+
+Tsibble permits time gaps. It is recommended to check time gaps before transformation and modelling. Bc you are likely to encounter errors if gaps in time. Luckily no gaps in these two data sets.
+
+Tsibble provides formal organisation on how to tidy your temporal data.
 
 ---
 
@@ -606,6 +650,12 @@ web_ts %&gt;%
 ```
 
 &lt;img src="figure/web-ggplot-1.svg" style="display: block; margin: auto;" /&gt;
+
+???
+
+Tsibble as a data object, it's also the first time series object that can directly talk to grammar of graphics, without coercion.
+
+The grammar of graphics defines plots as a functional mapping from data points to graphical elements. The plot is initialised through mapping variables from data space to graphical space. Variable `Date` is mapped to x axis and `Users` mapped to y axis. But I haven't put the visual elements on the canvas yet. So it's just empty.
 
 ---
 
@@ -622,6 +672,12 @@ web_ts %&gt;%
 
 &lt;img src="figure/web-geom-1.svg" style="display: block; margin: auto;" /&gt;
 
+???
+
+Instead of a line chart, I add an area geom on the canvas with specified colours.
+
+This plot tells my phd life was quiet in the first year. Since May 2017, this website started to attract more or less traffic. It was the time I started to deliver workshops and present to a wider audience. The year of 2018 saw many spikes, because I talked, talked, and talked a lot. It was fun to look at how my phd performs over three years.
+
 ---
 
 class: inverse middle
@@ -634,9 +690,11 @@ class: inverse middle
 
 ???
 
-Naming a function is difficult.
+Tsibble is not only a data abstraction, but also a DSL for wrangling temporal data.
 
-I like a verb that describes the software development is "craft".
+Like we can make a plot layer by layer with grammar of graphics, we can chain operation by operation using tsibble to make a complete analysis. Bc the grammar is declarative.
+
+When I actually develop tsibble, I started to appreciate the tidyverse team. Lots of amazing design thinking behind it. A fluent and consistent API gives an intuitive pipeline but it takes lots of time to refine the idea. For example, naminng a thing is difficult.
 
 ---
 
@@ -665,9 +723,16 @@ I like a verb that describes the software development is "craft".
 
 ???
 
-4 blocks of functions
+In order to master a language, we need to learn vocabularies first.
 
-Each focuses on doing one little thing and doing it well.
+The tsibble dictionary divides into 4 major blocks.
+
+1. Vector functions deals with 1 dimentional vector, mostly time vector
+2. Unlike vector functions, table verbs take a data table and returns a data table
+3. It is necessary to have commonly-used rolling window operations
+4. Other functions to make tsibble extensible to support new index type and data class.
+
+These functions are written and organised independently to achieve greater flexibility. so users can interweave any of these functions to solve a particular problem. This slide gives you a fraction of vocabularies.
 
 ---
 
@@ -684,6 +749,10 @@ class: center
 
 ### [tsibble.tidyverts.org](https://tsibble.tidyverts.org)
 ]
+
+???
+
+To check out the full list, here it is.
 
 ---
 
@@ -706,6 +775,10 @@ class: center middle
 ]
 ]
 
+???
+
+If you're familiar with the tidyverse, the learning curve for tsibble is very gentle. Bc tsibble leverages the tidyverse verbs but in a slightly different way.
+
 ---
 
 .pull-left[
@@ -716,7 +789,7 @@ web %&gt;% select(Users)
 ```
 
 ```
-#&gt; # A tibble: 1,096 x 1
+#&gt; # A tibble: 1,100 x 1
 #&gt;   Users
 #&gt;   &lt;dbl&gt;
 #&gt; 1     0
@@ -725,7 +798,7 @@ web %&gt;% select(Users)
 #&gt; 4     0
 #&gt; 5     0
 #&gt; 6     0
-#&gt; # … with 1,090 more rows
+#&gt; # … with 1,094 more rows
 ```
 ]
 .pull-right[
@@ -740,7 +813,7 @@ web_ts %&gt;% select(Users)
 ```
 
 ```
-#&gt; # A tsibble: 1,096 x 2 [1D]
+#&gt; # A tsibble: 1,100 x 2 [1D]
 #&gt;   Users Date      
 #&gt;   &lt;dbl&gt; &lt;date&gt;    
 #&gt; 1     0 2016-03-22
@@ -749,9 +822,17 @@ web_ts %&gt;% select(Users)
 #&gt; 4     0 2016-03-25
 #&gt; 5     0 2016-03-26
 #&gt; 6     0 2016-03-27
-#&gt; # … with 1,090 more rows
+#&gt; # … with 1,094 more rows
 ```
 ]
+
+???
+
+I'm constrasting how the same verb works differently for a normal data table and a tsibble.
+
+For example, selecting columns from a normal data table, you get a table with that columns.
+
+However, selecting tsibble's columns, it automatically selects the index variable. it always keeps the time context around and will not drop it. Without index and key, a tsibble will no longer be a tsibble.
 
 ---
 
@@ -767,7 +848,7 @@ web %&gt;%
 #&gt; # A tibble: 1 x 1
 #&gt;   Users
 #&gt;   &lt;dbl&gt;
-#&gt; 1  4898
+#&gt; 1  4942
 ```
 ]
 .pull-right[
@@ -779,7 +860,7 @@ web_ts %&gt;%
 ```
 
 ```
-#&gt; # A tsibble: 1,096 x 2 [1D]
+#&gt; # A tsibble: 1,100 x 2 [1D]
 #&gt;   Date       Users
 #&gt;   &lt;date&gt;     &lt;dbl&gt;
 #&gt; 1 2016-03-22     0
@@ -788,9 +869,15 @@ web_ts %&gt;%
 #&gt; 4 2016-03-25     0
 #&gt; 5 2016-03-26     0
 #&gt; 6 2016-03-27     0
-#&gt; # … with 1,090 more rows
+#&gt; # … with 1,094 more rows
 ```
 ]
+
+???
+
+Summarising a table, it reduces to a single value. But summarising a tsibble, it computes the values over time. For this case, it returns itself.
+
+We use the tidyverse verbs to avoid introducing new verbs for less cognitive burden on users. But we give those verbs more contextual meaning so they behave more intuitively in the temporal context.
 
 ---
 
@@ -813,12 +900,22 @@ web_year &lt;- web_ts %&gt;%
 #&gt; 1  2016   163
 #&gt; 2  2017  1149
 #&gt; 3  2018  2562
-#&gt; 4  2019  1024
+#&gt; 4  2019  1068
 ```
 ]
 .pull-right[
 &lt;img src="figure/web-year-bar-1.svg" style="display: block; margin: auto;" /&gt;
 ]
+
+???
+
+We gradually build up our vocabularies in order to write a sentence and futher compose prose.
+
+For example, this sentence begins with the data. And an action performed on this data is an adverb plus a verb. This describes this action is aggregating daily data to annual data.
+
+Yearly data makes my story look promising. Visitors doubled every year. The first quarter of this year is almost as the sumup of 2017.
+
+This is a brief sentence with the web traffic.
 
 ---
 
@@ -852,6 +949,14 @@ sel_delay &lt;- flights_ts %&gt;%
 &lt;img src="figure/sel-flights-plot-1.svg" style="display: block; margin: auto;" /&gt;
 ]
 
+???
+
+A paragraph for airline traffic is made up of two adv and two verbs. Selecting three airports: JFK, Hawaii, and LAX from hundreds of them. and then get a summary of daily percentage delay for each airport.
+
+The airport in Hawaii, is low in delay with better on-time performance all year around.
+
+Once you internalise this set of grammar, all sorts of transformation come handy.
+
 ---
 
 class: inverse middle
@@ -861,6 +966,12 @@ class: inverse middle
 &lt;hr&gt;
 
 ### [FP focuses on expressions instead of for-loop statements.](https://en.wikipedia.org/wiki/Functional_programming)
+
+???
+
+The third aspect of tsibble is adopting FP for rolling windows.
+
+When doing rolling window analysis, we cannot avoid for loops. But tsibble's rolling family keeps users away from for loops. and help concentrate on what you're going to achieve instead of how you're going to achieve.
 
 ---
 
@@ -881,11 +992,11 @@ ma_x1
 ```
 
 ```r
-ma_x2 &lt;- double(length = length(x) - 2)
-for (i in seq_along(ma_x2)) {
-* ma_x2[i] &lt;- mean(x[i:(i + 2)])
+mm_x2 &lt;- integer(length = length(x) - 2)
+for (i in seq_along(mm_x2)) {
+* mm_x2[i] &lt;- median(x[i:(i + 2)])
 }
-ma_x2
+mm_x2
 ```
 
 ```
@@ -898,6 +1009,14 @@ ma_x2
 ]
 ]
 
+???
+
+A toy example: computing moving averages for window size 2 and median for 3
+
+In order to compute the mean and median, I have to do a bit of setup for the loop. But the only part we're interested is the action: mean and median.
+
+The length of output is not stable, depending on the the choice window size. This is for loop
+
 ---
 
 .pull-left[
@@ -917,11 +1036,11 @@ ma_x1
 ```
 
 ```r
-ma_x2 &lt;- double(length = length(x) - 2)
-for (i in seq_along(ma_x2)) {
-* ma_x2[i] &lt;- mean(x[i:(i + 2)])
+mm_x2 &lt;- integer(length = length(x) - 2)
+for (i in seq_along(mm_x2)) {
+* mm_x2[i] &lt;- median(x[i:(i + 2)])
 }
-ma_x2
+mm_x2
 ```
 
 ```
@@ -931,7 +1050,7 @@ ma_x2
 .pull-right[
 
 ```r
-slide_dbl(x, ~ mean(.), .size = 2)
+slide_dbl(x, mean, .size = 2)
 ```
 
 ```
@@ -940,7 +1059,7 @@ slide_dbl(x, ~ mean(.), .size = 2)
 ```
 
 ```r
-slide_dbl(x, ~ mean(.), .size = 3)
+slide_int(x, median, .size = 3)
 ```
 
 ```
@@ -951,6 +1070,10 @@ slide_dbl(x, ~ mean(.), .size = 3)
 ### ⬆️ Functionals
 ]
 ]
+
+???
+
+What I mean by FP? It abstracts away the for-loop, and focus on what you want to do by supplying a function. And it's length-stable and type-stable.
 
 ---
 
@@ -973,10 +1096,28 @@ slide_dbl(x, ~ mean(.), .size = 3)
 &lt;br&gt;
 * as simple as moving average calculation
 * as complex as rolling model fitting
-* time series cross validation
-* arbitrary types of inputs &amp; outputs
-* parallel processing
+* useful for time series cross validation
+* allow arbitrary types of inputs &amp; outputs
+* support parallel processing
 ]
+
+???
+
+3 types of rolling window
+
+1. sliding: moves a fixed length window through the data with overlapping
+2. tiling: moves a fixed length window through the data w/o overlapping
+3. stretching: fix an initial window and expand to include more observations.
+
+The animation shows three different rolling averages.
+
+it takes an arbitrary function: simple complex
+
+time series CV: easier to compute forecasting accuracy by comparing rolling forecast with rolling data
+
+...
+
+The only limit for how to use this family for window-related analysis is your imagination. 
 
 ---
 
@@ -985,6 +1126,10 @@ class: middle center
 &lt;img src="img/tsibble.png", height = "250px"&gt;&lt;img src="img/fable.png", height = "250px"&gt;
 
 ## The future is just around the corner.
+
+???
+
+Last year, I said tsibble was going to be the future of time series. This year, I would say the future is around the corner. A few dependent packages have been developed around the tsibble structure, including the new fable package for forecasting to replace the forecast package. Rob has already started teaching this set of cutting-edge tools in his class this semester. The next generation of forecasters will be more productive.
 
 ---
 
@@ -1003,6 +1148,16 @@ background-position: 91% 38%
 
 ### .bottom[.center[Tsibble provides &lt;br&gt; fundamental computing infrastructure.]]
 
+???
+
+What's my contribution is:
+
+Tsibble provides a uniform and standardized temporal data structure for downstream analytic tasks. You can easily transform, visualise and model your temporal data, and smoothly shifts between them for rapid iteration to gain data insights.
+
+Tsibble also provides a descriptive grammar that you can express your temporal data analysis problem easily.
+
+Lemme show you a final example to conclude this part by chaining these 3 parts together.
+
 ---
 
 .pull-left[
@@ -1018,7 +1173,7 @@ web_fcast &lt;- web_mth %&gt;%
   forecast(h = 9) %&gt;% 
   mutate(type = "forecast")
 # visualise
-p &lt;- web_mth %&gt;% 
+web_mth %&gt;% 
   mutate(type = "data") %&gt;% 
   rbind(web_fcast) %&gt;% 
   group_by(type) %&gt;% 
@@ -1038,11 +1193,82 @@ p &lt;- web_mth %&gt;%
 &lt;/details&gt;
 ]
 
+???
+
+I'm interested in my website traffic performance in the rest of the year.
+
+3 paragraphs here:
+
+1. summarising daily to monthly data, shorten this long series
+2. fit an ETS and forecast 9 months ahead
+3. bind historical data and forecast together and aggregate to yearly data.
+
+Xkcd man tells I've got 3000 users to achieve, so pressure is on.
+
+I hope this pipeline looks intuitive to me.
+
+---
+
+## How others think?
+
+.pull-left[
+&lt;blockquote class="twitter-tweet" data-lang="en"&gt;&lt;p lang="en" dir="ltr"&gt;I&amp;#39;m in awe of &lt;a href="https://twitter.com/earowang?ref_src=twsrc%5Etfw"&gt;@earowang&lt;/a&gt;&amp;#39;s `tsibble` package. Intuitive time series verbage for tidyverse pipelines. Tonight it is eating up tweet summarisation: &lt;a href="https://twitter.com/hashtag/rstats?src=hash&amp;amp;ref_src=twsrc%5Etfw"&gt;#rstats&lt;/a&gt; &lt;a href="https://t.co/Ji5FGZFxfn"&gt;pic.twitter.com/Ji5FGZFxfn&lt;/a&gt;&lt;/p&gt;&amp;mdash; Miles McBain (@MilesMcBain) &lt;a href="https://twitter.com/MilesMcBain/status/1076833653395615744?ref_src=twsrc%5Etfw"&gt;December 23, 2018&lt;/a&gt;&lt;/blockquote&gt; &lt;script async src="https://platform.twitter.com/widgets.js" charset="utf-8"&gt;&lt;/script&gt; 
+]
+.pull-right[
+&lt;blockquote class="twitter-tweet" data-lang="en"&gt;&lt;p lang="en" dir="ltr"&gt;At &lt;a href="https://twitter.com/hashtag/RStudioConf?src=hash&amp;amp;ref_src=twsrc%5Etfw"&gt;#RStudioConf&lt;/a&gt; &lt;a href="https://twitter.com/earowang?ref_src=twsrc%5Etfw"&gt;@earowang&lt;/a&gt; tells us about fables, mables and tsibbles. I feel like I’m in an alternate universe where everything is easy with time series. 🧚‍♂️ &lt;a href="https://t.co/fNir8ARlS0"&gt;pic.twitter.com/fNir8ARlS0&lt;/a&gt;&lt;/p&gt;&amp;mdash; Laura Ellis (@LittleMissData) &lt;a href="https://twitter.com/LittleMissData/status/1086024763443695616?ref_src=twsrc%5Etfw"&gt;January 17, 2019&lt;/a&gt;&lt;/blockquote&gt; &lt;script async src="https://platform.twitter.com/widgets.js" charset="utf-8"&gt;&lt;/script&gt; 
+]
+
 ---
 
 class: inverse middle
 
 # .blue[&lt;i class="fas fa-step-backward"&gt;&lt;/i&gt;] Calendar-based graphics
+
+&lt;hr&gt;
+
+### Revision and resubmission for JCGS
+
+???
+
+Tsibble forms the second chapter, and it is submitted to JCGS. 
+
+One step backward is the first chapter on calendar-based graphics. It is tentatively accepted by JCGS, asking for revision and resubmission.
+
+---
+
+class: middle center
+
+.left-column[
+## Inspired by calendar &lt;hr&gt; Return &lt;br&gt; to &lt;br&gt; calendar
+]
+.right-column[
+&lt;img src="img/numbats-calendar.jpg", height = "600px"&gt;
+]
+
+???
+
+The calendar plot is inspired by the actual calendar. You mark your daily schedule on this calendar, and we draw glyphs instead. Interestingly, the function that I wrote for the calendar plot also makes this physical copy of the calendar for our numbats group. So it returns to the calendar.
+
+---
+
+## Calendar layout
+
+&lt;img src="figure/calendar-layout-1.svg" style="display: block; margin: auto;" /&gt;
+
+???
+
+The hard work is to layout the panels in the calendar format.
+
+1. is to determine what's the weekday that the first day of the month starts, and use modulus arithimetis to figure out the rest.
+The calendar conforms to 5 rows by 7 columns. The days that exceed the 5th week are wrapped to the first top rows.
+
+Once the layout is setup, the plot drops in.
+
+---
+
+## Calendar plot
+
+&lt;img src="figure/calendar-plot-1.svg" style="display: block; margin: auto;" /&gt;
 
 ---
 
@@ -1057,11 +1283,25 @@ class: inverse middle
 &lt;img src="https://pbs.twimg.com/media/DU0d5cVVAAA7OWw.jpg", width = "100%"&gt;
 ]
 
+???
+
+User cases by others
+
+1. a runner
+
 ---
 
 class: inverse middle
 
 # Missingness in time .blue[&lt;i class="fas fa-step-forward"&gt;&lt;/i&gt;]
+
+&lt;hr&gt;
+
+### Work in progress
+
+???
+
+One step forward is exploring missing patterns for time series. Many works have been done on missing data, but few for time series. With the support from tsibble, we can better handle temporal missing values from the data-centric point of view.
 
 ---
 
@@ -1074,11 +1314,30 @@ class: inverse middle
 ]
 ]
 
+???
+
+We have grouped types of missings into 4 groups.
+
+---
+
+class: middle
+
+## Missingness in time
+
+* Process for generating missing data in time
+* Tools for exploring temporal patterns of missingness
+* Assessing results of imputation techniques
+* Case study
+
 ---
 
 class: inverse middle
 
 # 🌟 Impact
+
+???
+
+It's generally difficult to measure the research impact. But I've got 2 R pkgs associated with each chapter. Using the pkg metrics could be good proxy.
 
 ---
 
@@ -1094,7 +1353,7 @@ class: middle
 🏆 2019 John Chambers Statistical Software Award from ASA Section on Statistical Computing
 ]
 .pull-right[
-Total downloads, as of 2019-03-24
+Total downloads, as of 2019-03-26
 &lt;img src="figure/software-impact-1.svg" style="display: block; margin: auto;" /&gt;
 ]
 
@@ -1108,6 +1367,17 @@ class: inverse middle
 
 ### A form of publication contains all data and software for better reproducibility, besides the text and figures.
 **Marwick et al. (2018) [peerj.com/preprints/3192](https://peerj.com/preprints/3192/)**
+
+???
+
+Finally I'd like to share with you some of my thoughts on organising a thesis. I learned this term RC at this year's rstudio conference.
+
+1. is a container contains the document and its computations (i.e. text, code, data,...) making code and data available is equally important as text and figures.
+2. provides a way for distributing, managing and updating the collection.
+
+In this peerj paper, Ben Marwick discusses RC provides a standard and easily recognisable way for organising the digital materials of a research project for better transparency and reproducibility.
+
+I think it's a brilliant idea. I've been practicing it for the thesis.
 
 ---
 
@@ -1132,6 +1402,10 @@ class: middle
 ### .center[&lt;i class="fab fa-github"&gt;&lt;/i&gt; [earowang/thesis](https://github.com/earowang/thesis)]
 
 ## .center[Persistent reproducibility]
+
+???
+
+It turns out the R pkg structure is well suited for organising research project, if you're using R for analysis.
 
 ---
 
@@ -1202,6 +1476,7 @@ class: inverse middle center
 <style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
 <script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
 <script src="https://buttons.github.io/buttons.js"></script>
+<script src="https://platform.twitter.com/widgets.js"></script>
 <script>var slideshow = remark.create({
 "ratio": "16:9",
 "highlightStyle": "github",
